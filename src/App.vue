@@ -1,26 +1,72 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <header class="select-difficulty-header">
+      <img
+          class="logo"
+          src="@/assets/logo_rjd.png"
+          alt="Логотип РЖД"
+      />
+    </header>
+    <router-view />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+};
 </script>
 
 <style>
+/* Подключение шрифта (пример) */
+@font-face {
+  font-family: 'Kaph';
+  src: url('@/assets/fonts/Kaph.woff2') format('woff2'),
+  url('@/assets/fonts/Kaph.woff') format('woff'),
+  url('@/assets/fonts/Kaph.ttf') format('ttf'),
+  url('@/assets/fonts/Kaph.otf') format('otf');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Kaph', sans-serif;
+  background: url('@/assets/background.png') no-repeat center center;
+  background-size: cover;
+}
+
+/* Шапка */
+.select-difficulty-header {
+  display: block;
+  padding: 2rem;
+  text-align: left;
+}
+
+/* Логотип по умолчанию (Desktop) */
+.select-difficulty-header .logo {
+  display: block;
+  width: 200px; /* Desktop: 200px */
+  height: auto;
+}
+
+/* Tablet: уменьшим до 120px (примерный брейкпоинт 768px) */
+@media (max-width: 768px) {
+  .select-difficulty-header .logo {
+    width: 160px;
+  }
+}
+
+/* Mobile: ещё меньше – 80px (примерный брейкпоинт 480px) */
+@media (max-width: 480px) {
+  .select-difficulty-header .logo {
+    width: 140px;
+  }
+
+  .select-difficulty-header {
+    padding: 3rem 2rem 1rem 2rem;
+  }
 }
 </style>

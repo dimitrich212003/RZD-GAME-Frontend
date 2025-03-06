@@ -1,0 +1,196 @@
+
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+ul,
+ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+:root {
+    /* Цвета (пример) */
+    --color-primary: #336699;
+    --color-secondary: #FF9800;
+    --color-accent: #FF5722;
+    --color-background: #f3f3f3;
+    --color-text: #333333;
+    --color-white: #ffffff;
+
+    /* Размеры шрифтов (примерная шкала) */
+    --font-size-base: 16px;
+    --font-size-sm: 14px;
+    --font-size-md: 18px;
+    --font-size-lg: 24px;
+    --font-size-xl: 32px;
+
+    /* Отступы (пример) */
+    --spacing-sm: 0.5rem; /* 8px */
+    --spacing-md: 1rem;   /* 16px */
+    --spacing-lg: 2rem;   /* 32px */
+
+    /* Прочее (пример) */
+    --border-radius-base: 8px;
+    --transition-base: 0.3s ease-in-out;
+}
+
+/* =======================
+   3. Базовые стили HTML-тегов
+   ======================= */
+
+/* Устанавливаем базовый шрифт и фон на body */
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    background-color: var(--color-background);
+    line-height: 1.4;
+}
+
+/* Заголовки H1–H6 с примерными размерами */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.2;
+    color: var(--color-text);
+}
+
+h1 {
+    font-size: var(--font-size-xl);
+}
+
+h2 {
+    font-size: var(--font-size-lg);
+}
+
+h3 {
+    font-size: calc(var(--font-size-lg) - 4px);
+}
+
+h4 {
+    font-size: var(--font-size-md);
+}
+
+h5 {
+    font-size: calc(var(--font-size-md) - 2px);
+}
+
+h6 {
+    font-size: var(--font-size-sm);
+}
+
+p {
+    margin-bottom: var(--spacing-md);
+}
+
+/* Ссылки при наведении */
+a:hover {
+    opacity: 0.8;
+}
+
+/* Картинки по умолчанию – адаптивные */
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* =======================
+   4. Кнопки
+   ======================= */
+button {
+    display: inline-block;
+    font-family: 'Kaph', sans-serif;
+    font-size: var(--font-size-base);
+    color: var(--color-white);
+    background-color: var(--color-primary);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-base);
+    cursor: pointer;
+    transition: background-color var(--transition-base);
+}
+
+button:hover {
+    background-color: var(--color-accent);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =======================
+   5. Формы (input, select, textarea)
+   ======================= */
+input,
+select,
+textarea {
+    font-family: 'Kaph', sans-serif;
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    padding: var(--spacing-sm);
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius-base);
+    outline: none;
+    transition: border-color var(--transition-base);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--color-primary);
+}
+
+/* =======================
+   6. Утилитарные классы (необязательно, пример)
+   ======================= */
+
+/* Класс для скрытия элемента, но сохранения места под него */
+.hidden {
+    display: none !important;
+}
+
+/* Класс для полностью невидимого элемента, но оставляющего место (visibility:hidden) */
+.invisible {
+    visibility: hidden !important;
+}
+
+/* Класс для выравнивания по центру (контейнер) */
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Класс для убирания текста с экрана, но сохранения для скринридеров */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
