@@ -1,13 +1,15 @@
 <template>
   <div id="app">
-    <header class="select-difficulty-header">
-      <img
-          class="logo"
-          src="@/assets/logo_rjd.png"
-          alt="Логотип РЖД"
-      />
-    </header>
-    <router-view />
+    <div class="app__container">
+      <header class="select-difficulty-header">
+        <img
+            class="logo"
+            src="@/assets/logo_rjd.png"
+            alt="Логотип РЖД"
+        />
+      </header>
+      <router-view />
+    </div>
   </div>
 </template>
 
@@ -32,10 +34,14 @@ export default {
 
 #app {
   min-height: 100vh;
-  margin: 0;
   font-family: 'Kaph', sans-serif;
   background: url('@/assets/background.png') no-repeat center center;
   background-size: cover;
+}
+
+.app__container {
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 /* Шапка */

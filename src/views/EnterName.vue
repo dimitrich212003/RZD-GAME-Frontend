@@ -117,8 +117,8 @@ export default {
         showError.value = true;
         return;
       }
-      foxStore.setUserName(localName.value.trim());
-      router.push({ name: 'SelectGame' });
+      foxStore.setFoxName(localName.value.trim());
+      router.push({ name: 'MainMenu' });
     };
 
     return {
@@ -171,7 +171,7 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%) scale(1);
   max-width: 130%;
-  transition: transform 0.15s ease-in-out; /* Быстрый отклик */
+  transition: transform 0.15s ease-in-out;
 }
 
 /* При клике чуть уменьшаем */

@@ -1,5 +1,7 @@
 <template>
-
+  <div>
+    Игры
+  </div>
 </template>
 
 <script>
