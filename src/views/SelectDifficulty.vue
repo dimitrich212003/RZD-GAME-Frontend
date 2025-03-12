@@ -1,4 +1,7 @@
 <template>
+  <header>
+    <Logo/>
+  </header>
   <div class="select-difficulty-container">
     <h1 class="select-difficulty-title">Привет! Выбери уровень игры</h1>
     <!-- Карточки с лисёнками -->
@@ -24,17 +27,26 @@
 
 <script>
 import { useDifficultyStore } from '@/stores/difficultyStore';
+import { useFoxStore } from '@/stores/foxStore';
 import { useRouter } from 'vue-router';
+import Logo from "@/components/Logo";
 
 export default {
   name: 'SelectDifficulty',
+  components: {Logo},
   setup() {
     const difficultyStore = useDifficultyStore();
+    const foxStore = useFoxStore();
     const router = useRouter();
 
     const chooseLevel = (level) => {
       difficultyStore.setDifficulty(level);
-      router.push({ name: 'EnterName' });
+      foxStore.loadFromLocalStorage();
+      if (foxStore.foxName) {
+        router.push({ name: 'Profile' });
+      } else {
+        router.push({ name: 'EnterName' });
+      }
     };
 
     return {

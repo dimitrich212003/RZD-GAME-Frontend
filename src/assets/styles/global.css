@@ -98,7 +98,6 @@ h6 {
 }
 
 p {
-    margin-bottom: var(--spacing-md);
 }
 
 /* Ссылки при наведении */
@@ -122,7 +121,6 @@ button {
     font-size: var(--font-size-base);
     color: var(--color-white);
     background-color: var(--color-primary);
-    padding: var(--spacing-sm) var(--spacing-md);
     border: none;
     border-radius: var(--border-radius-base);
     cursor: pointer;

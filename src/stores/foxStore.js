@@ -10,16 +10,24 @@ function persistPlugin({ store }) {
 export const useFoxStore = defineStore('foxStore', {
     state: () => ({
         foxName: '',
+        totalCoins: 7850,
     }),
     actions: {
         setFoxName(name) {
             this.foxName = name;
+        },
+        addCoins(amount) {
+            this.totalCoins += amount;
+        },
+        resetCoins() {
+            this.totalCoins = 0;
         },
         loadFromLocalStorage() {
             const data = localStorage.getItem('foxStore');
             if (data) {
                 const parsed = JSON.parse(data);
                 this.foxName = parsed.foxName || '';
+                this.totalCoins = parsed.totalCoins ?? 0; // Загружаем монеты или 0
             }
         },
     },

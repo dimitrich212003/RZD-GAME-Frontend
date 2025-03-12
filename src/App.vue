@@ -1,13 +1,6 @@
 <template>
   <div id="app">
     <div class="app__container">
-      <header class="select-difficulty-header">
-        <img
-            class="logo"
-            src="@/assets/logo_rjd.png"
-            alt="Логотип РЖД"
-        />
-      </header>
       <router-view />
     </div>
   </div>

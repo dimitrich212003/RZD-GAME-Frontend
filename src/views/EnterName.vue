@@ -1,17 +1,16 @@
 <template>
+  <header>
+    <Logo/>
+  </header>
   <div class="enter-name-container">
     <div class="content-wrapper">
-      <!-- Блок лисёнка -->
       <div class="fox-avatar">
-        <!-- Само изображение лисёнка -->
         <img
             :class="{ clicked: isClicked }"
             @click="handleFoxClick"
             src="@/assets/1level.png"
             alt="Лисёнок"
         />
-
-        <!-- Монетки, генерируемые при клике -->
         <div
             v-for="coin in coins"
             :key="coin.id"
@@ -22,20 +21,18 @@
           }"
         ></div>
       </div>
-
-      <!-- Блок формы -->
       <div class="form-block">
         <h2 class="title">Введи имя твоего лисенка</h2>
         <input
             type="text"
             class="name-input"
             v-model="localName"
-            :maxlength="12"
+            :maxlength="10"
             :class="{ 'invalid': showError }"
             placeholder="Например, Рыжик..."
             @input="validateName"
         />
-        <p v-if="showError" class="error-text">Введите имя (до 12 символов)</p>
+        <p v-if="showError" class="error-text">Введите имя (до 10 символов)</p>
 
         <button
             :disabled="!isValid"
@@ -53,27 +50,28 @@
 import { useFoxStore } from '@/stores/foxStore';
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
+import Logo from "@/components/Logo";
 
 export default {
   name: 'EnterName',
+  components: {
+    Logo
+  },
   setup() {
     const router = useRouter();
     const foxStore = useFoxStore();
 
-    // Локальное состояние поля ввода
     const localName = ref('');
     const showError = ref(false);
 
-    // Валидное имя: не пустое и <= 12 символов
     const isValid = computed(() => {
-      return localName.value.trim().length > 0 && localName.value.trim().length <= 12;
+      return localName.value.trim().length > 0 && localName.value.trim().length <= 10;
     });
 
     const validateName = () => {
       showError.value = !isValid.value;
     };
 
-    // --- Анимация лисёнка при клике ---
     const isClicked = ref(false);
 
     // Массив монеток
@@ -81,31 +79,30 @@ export default {
 
     // Клик по лисёнку: scale + spawn монеток
     const handleFoxClick = () => {
-      // 1. Быстрая анимация "сжатия"
       isClicked.value = true;
       setTimeout(() => {
         isClicked.value = false;
-      }, 150); // через 0.15с возвращаемся к scale(1)
+      }, 150);
 
       // 2. Запускаем монетки
       spawnCoins();
     };
 
-    // Создаём 5 монеток с рандомным направлением/расстоянием
+    // Создаём 5 монеток с рандомным направлением
     const spawnCoins = () => {
       const newCoins = [];
       for (let i = 0; i < 5; i++) {
-        const angle = Math.random() * 2 * Math.PI;  // от 0 до 2π
-        const distance = 80 + Math.random() * 70;   // пусть разлетаются на 80..150px
+        const angle = Math.random() * 2 * Math.PI;
+        const distance = 80 + Math.random() * 70;
         newCoins.push({
           id: Date.now() + '-' + i,
           x: Math.cos(angle) * distance,
-          y: Math.sin(angle) * -distance, // минус, чтобы летели вверх
+          y: Math.sin(angle) * -distance,
         });
       }
       coins.value.push(...newCoins);
 
-      // Удаляем эти монетки из массива через 1с (по окончанию анимации)
+      // Удаляем эти монетки из массива через 1с
       setTimeout(() => {
         coins.value.splice(0, newCoins.length);
       }, 1000);
@@ -127,7 +124,6 @@ export default {
       isValid,
       validateName,
       submitName,
-      // Лисёнок + монетки
       isClicked,
       handleFoxClick,
       coins
@@ -152,7 +148,6 @@ export default {
   padding: 0 2rem;
 }
 
-/* ------ Лисёнок ------ */
 .fox-avatar {
   flex-shrink: 0;
   width: clamp(350px, 40vw, 500px);
@@ -163,23 +158,20 @@ export default {
   position: relative;
 }
 
-/* Само изображение */
 .fox-avatar img {
   position: absolute;
   cursor: pointer;
-  top: 45%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%) scale(1);
-  max-width: 130%;
+  max-width: 90%;
   transition: transform 0.15s ease-in-out;
 }
 
-/* При клике чуть уменьшаем */
 .fox-avatar img.clicked {
   transform: translate(-50%, -50%) scale(0.9);
 }
 
-/* ------ Монетки ------ */
 .coin {
   --x: 0px;
   --y: 0px;
@@ -205,9 +197,6 @@ export default {
   }
 }
 
-
-
-/* ------ Форма ввода ------ */
 .form-block {
   display: flex;
   flex-direction: column;
@@ -216,7 +205,6 @@ export default {
   width: 100%;
 }
 
-/* Заголовок */
 .title {
   font-size: clamp(1.4rem, 3vw, 2rem);
   margin-bottom: 1.5rem;
@@ -224,7 +212,6 @@ export default {
   text-align: center;
 }
 
-/* Поле ввода */
 .name-input {
   font-size: 1rem;
   padding: 0.8rem;
@@ -240,7 +227,6 @@ export default {
   border-color: red;
 }
 
-/* Текст ошибки */
 .error-text {
   color: red;
   font-size: 0.9rem;
@@ -248,7 +234,6 @@ export default {
   text-align: center;
 }
 
-/* Кнопка */
 .submit-button {
   font-size: clamp(1rem, 2.5vw, 1.3rem);
   background-color: #d50000;
@@ -273,7 +258,6 @@ export default {
   background-color: #b71c1c;
 }
 
-/* Адаптация */
 @media (max-width: 992px) {
   .content-wrapper {
     flex-direction: column;

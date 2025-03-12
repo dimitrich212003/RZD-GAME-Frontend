@@ -1,5 +1,8 @@
 <template>
   <div class="main-menu-container">
+    <header class="top-bar">
+      <Logo/>
+    </header>
     <div class="games-grid">
       <GameCard
           v-for="game in games"
@@ -16,40 +19,22 @@
       />
     </div>
   </div>
-  <nav class="bottom-nav">
-    <div
-        :class="['nav-item', { active: false }]"
-        @click="goToAchievements"
-    >
-      <img class="cup_icon nav_icon" src="@/assets/cup.svg" alt="Лисёнок - легкий уровень" />
-    </div>
-    <div
-        :class="['nav-item', { active: true }]"
-        @click="goToMenu"
-    >
-      <img class="game_icon nav_icon" src="@/assets/game_active.svg" alt="Лисёнок - легкий уровень" />
-    </div>
-    <div
-        :class="['nav-item', { active: false }]"
-        @click="goToProfile"
-    >
-      <img class="person_icon nav_icon" src="@/assets/person.svg" alt="Лисёнок - легкий уровень" />
-
-    </div>
-  </nav>
+  <NavBar activeTab="MainMenu" />
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
 import GameCard from '../components/GameCard.vue';
+import NavBar from "@/components/NavBar";
+import Logo from "@/components/Logo";
 
 export default {
   name: 'MainMenu',
   components: {
+    NavBar,
     GameCard,
+    Logo
   },
   setup() {
-    const router = useRouter();
 
     const games = [
       {
@@ -97,30 +82,8 @@ export default {
         aliIt: 'flex-end'
       },
     ];
-
-    const changeDifficulty = () => {
-      router.push({ name: 'SelectDifficulty' });
-    };
-
-    // Нижняя панель
-    const goToAchievements = () => {
-      router.push({ name: 'Achievements' });
-    };
-
-    const goToMenu = () => {
-      router.push({ name: 'MainMenu' });
-    };
-
-    const goToProfile = () => {
-      router.push({ name: 'Profile' });
-    };
-
     return {
       games,
-      changeDifficulty,
-      goToAchievements,
-      goToMenu,
-      goToProfile,
     };
   },
 };
@@ -130,35 +93,16 @@ export default {
 .main-menu-container {
   display: flex;
   flex-direction: column;
-  height: 80vh;
-  overflow: auto;
+  height: 91vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-/* ВЕРХНЯЯ ПАНЕЛЬ */
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
 }
-
-.top-bar .logo {
-  width: clamp(100px, 15vw, 200px);
-}
-
-.change-difficulty {
-  background-color: transparent;
-  border: 2px solid #003399;
-  color: #003399;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.change-difficulty:hover {
-  background-color: #dde;
-}
-
 
 .games-grid {
   display: grid;
@@ -167,53 +111,6 @@ export default {
   row-gap: 3rem;
   column-gap: 2rem;
   padding: 2.6rem 4rem;
-}
-
-
-/* Нижняя панель */
-.bottom-nav {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background-color: #00A0E3;
-  padding: 0.5rem;
-  width: 300px;
-  height: 60px;
-  border-radius: 40px;
-}
-
-.nav-item {
-  font-size: 1.5rem;
-  color: #fff;
-  opacity: 0.7;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-  position: relative;
-}
-
-.nav-item.active {
-  opacity: 1;
-}
-
-.nav-item.active::after {
-  content: "";
-  position: absolute;
-  bottom: -20px;
-  left: 57%;
-  transform: translateX(-54%);
-  width: 45px;
-  height: 20px;
-  background-image: url('@/assets/active.svg');
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-
-.nav-item:hover {
-  opacity: 1;
 }
 
 @media (max-width: 1100px) {
