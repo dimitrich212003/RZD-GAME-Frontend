@@ -4,7 +4,7 @@ import EnterName from "@/views/EnterName.vue";
 import MainMenu from "@/views/MainMenu";
 import Achievements from "@/views/Achievements";
 import Profile from "@/views/Profile";
-import GamePlay from "@/views/GamePlay";
+import MatchThreeGame from "@/views/MatchThreeGame";
 
 const routes = [
     {
@@ -33,10 +33,10 @@ const routes = [
         component: Profile,
     },
     {
-        path: '/game/:id',
-        name: 'GamePlay',
-        component: GamePlay,
-    },
+        path: '/game/dispatcher',
+        name: 'MatchThree',
+        component: MatchThreeGame
+    }
 ];
 
 const router = createRouter({

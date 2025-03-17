@@ -32,7 +32,7 @@ export default {
     subTitleColor: { type: String, default: '#fff' },
     imagePosition: { type: String, default: 'right' },
     textPosition: { type: String, default: 'left' },
-    aliIt: { type: String, default: 'flex-start' }
+    aliIt: { type: String, default: 'flex-start' },
   },
   setup(props) {
     const router = useRouter();

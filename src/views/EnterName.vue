@@ -1,8 +1,8 @@
 <template>
-  <header>
-    <Logo/>
-  </header>
   <div class="enter-name-container">
+    <header>
+      <Logo/>
+    </header>
     <div class="content-wrapper">
       <div class="fox-avatar">
         <img
@@ -135,14 +135,15 @@ export default {
 <style scoped>
 .enter-name-container {
   position: relative;
-  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 .content-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 2rem auto;
+  margin: 4rem auto 2rem auto;
   max-width: 1200px;
   gap: 4rem;
   padding: 0 2rem;

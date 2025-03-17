@@ -1,10 +1,9 @@
 <template>
-  <header>
-    <Logo/>
-  </header>
   <div class="select-difficulty-container">
+    <header>
+      <Logo/>
+    </header>
     <h1 class="select-difficulty-title">Привет! Выбери уровень игры</h1>
-    <!-- Карточки с лисёнками -->
     <div class="cards-wrapper">
       <div class="difficulty-card easy" @click="chooseLevel('easy')">
         <!-- Изображение лисёнка (малыш) -->
@@ -15,7 +14,6 @@
       </div>
 
       <div class="difficulty-card hard" @click="chooseLevel('hard')">
-        <!-- Изображение лисёнка (большой) -->
         <div class="fox-image">
           <img class="hard_img" src="@/assets/fox_hard.png" alt="Лисёнок - сложный уровень" />
         </div>
@@ -62,6 +60,8 @@ export default {
   flex-direction: column;
   align-items: center;
   padding: 0rem 2rem 2rem 2rem;
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 .select-difficulty-title {

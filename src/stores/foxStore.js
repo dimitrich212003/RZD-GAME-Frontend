@@ -10,7 +10,7 @@ function persistPlugin({ store }) {
 export const useFoxStore = defineStore('foxStore', {
     state: () => ({
         foxName: '',
-        totalCoins: 11000,
+        totalCoins: 250,
     }),
     actions: {
         setFoxName(name) {

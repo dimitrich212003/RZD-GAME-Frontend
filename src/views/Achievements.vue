@@ -75,6 +75,8 @@ export default {
   height: 91vh;
   overflow-y: auto;
   overflow-x: hidden;
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 .achievements-grid {

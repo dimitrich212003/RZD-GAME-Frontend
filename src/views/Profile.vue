@@ -249,6 +249,8 @@ export default {
   height: 91vh;
   overflow-y: auto;
   overflow-x: hidden;
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 /* Обёртка для лисёнка и инфоблока */
@@ -258,7 +260,7 @@ export default {
   justify-content: center;
   max-width: 1200px;
   gap: 4rem;
-  margin: 2rem auto;
+  margin: 4rem auto 2rem auto;
   padding: 0 2rem;
 }
 
