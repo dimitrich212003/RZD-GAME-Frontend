@@ -5,6 +5,7 @@ import MainMenu from "@/views/MainMenu";
 import Achievements from "@/views/Achievements";
 import Profile from "@/views/Profile";
 import MatchThreeGame from "@/views/MatchThreeGame";
+import PacmanGame from "@/views/PacmanGame";
 
 const routes = [
     {
@@ -36,6 +37,11 @@ const routes = [
         path: '/game/dispatcher',
         name: 'MatchThree',
         component: MatchThreeGame
+    },
+    {
+        path: '/game/machinist',
+        name: 'PacmanGame',
+        component: PacmanGame
     }
 ];
 
