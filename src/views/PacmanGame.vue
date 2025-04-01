@@ -1,7 +1,10 @@
 <template>
   <div class="pacman-container">
     <div class="ui-overlay">
-      <div class="score-display">Score: {{ scoreStore.score }}</div>
+      <div class="score-display">
+        <p>Очки: {{ scoreStore.score }}</p>
+        <p>Рекорд: {{ scoreStore.pacmanBestScore }}</p>
+      </div>
       <button class="exit-button" @click="exitGame">Выйти в меню</button>
     </div>
 
@@ -23,7 +26,7 @@
 
 <script>
 import {ref, onMounted, onUnmounted} from 'vue'
-import { useScoreStore } from '@/stores/pacmanScoreStore'
+import { usePacmanScoreStore } from '@/stores/pacmanScoreStore'
 import { useFoxStore } from '@/stores/foxStore'
 import { useRouter } from 'vue-router'
 
@@ -47,7 +50,7 @@ export default {
   components: { GameResultPopup },
   setup() {
     const gameCanvas = ref(null)
-    const scoreStore = useScoreStore()
+    const scoreStore = usePacmanScoreStore()
     const foxStore = useFoxStore()
     const router = useRouter()
 
@@ -757,6 +760,8 @@ export default {
 
 .score-display {
   font-size: 1.2rem;
+  display: flex;
+  gap: 15px;
 }
 
 .exit-button {

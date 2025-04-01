@@ -6,6 +6,8 @@ import Achievements from "@/views/Achievements";
 import Profile from "@/views/Profile";
 import MatchThreeGame from "@/views/MatchThreeGame";
 import PacmanGame from "@/views/PacmanGame";
+import PipeManiaGame from "@/views/PipeManiaGame";
+import WolfAndEggsGame from "@/views/WolfAndEggsGame";
 
 const routes = [
     {
@@ -42,6 +44,16 @@ const routes = [
         path: '/game/machinist',
         name: 'PacmanGame',
         component: PacmanGame
+    },
+    {
+        path: '/game/puteec',
+        name: 'PipeManiaGame',
+        component: PipeManiaGame
+    },
+    {
+        path: '/game/provodnik',
+        name: 'WolfAndEggsGame',
+        component: WolfAndEggsGame
     }
 ];
 

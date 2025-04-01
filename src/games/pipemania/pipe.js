@@ -16,7 +16,7 @@ export default class Pipe {
     checkConnection(otherPipe) {
         const dir1 = this.getFlowDir('out');
         const dir2 = Pipe.complement(dir1);
-        return otherPipe.flow.hasOwnProperty(dir2);
+        return Object.prototype.hasOwnProperty.call(otherPipe.flow, dir2);
     }
 
     getFlowDir(flow) {

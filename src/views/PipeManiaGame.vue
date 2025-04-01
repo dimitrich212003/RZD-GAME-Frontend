@@ -1,36 +1,87 @@
-<!-- src/views/PipeManiaGame.vue -->
 <template>
-  <div class="pipe-mania-container">
-    <!-- Кнопки / Overlay -->
-    <div class="ui-overlay">
-      <div class="score-display">Score: {{ currentScore }}</div>
-      <button class="exit-button" @click="exitGame">Выйти</button>
-      <button @click="startGame">Start</button>
-      <button @click="restartGame">Restart</button>
+  <!-- Верхняя панель (Score + кнопка «Выйти в меню») -->
+  <div class="ui-overlay">
+    <!-- Показываем текущее scoreStore.score -->
+    <div class="score-display">
+      <p>Очки: {{ scoreStore.score }}</p>
+      <p>Рекорд: {{ scoreStore.pipeManiaBestScore }}</p>
     </div>
+    <button class="exit-button" @click="exitGame">Выйти в меню</button>
+  </div>
 
-    <!-- Спрятанные картинки, чтобы document.getElementById('pipe0') работало -->
-    <!-- А также <img id="dirt" ...> -->
-    <!-- В реальном проекте, возможно лучше import'ы, но раз у вас "getElementById" -->
-    <div style="display: none;">
-      <img id="dirt" src="@/assets/pipeMania/dirt.png" />
-      <img id="pipe0" src="@/assets/pipeMania/0.png" />
-      <img id="pipe1" src="@/assets/pipeMania/1.png" />
-      <img id="pipe2" src="@/assets/pipeMania/2.png" />
-      <img id="pipe3" src="@/assets/pipeMania/3.png" />
-      <img id="pipe4" src="@/assets/pipeMania/4.png" />
-      <img id="pipe5" src="@/assets/pipeMania/5.png" />
-      <img id="pipe6" src="@/assets/pipeMania/6.png" />
-    </div>
-
+  <div id="pipe-mania">
     <!-- Canvas -->
-    <div class="canvas-wrapper">
-      <canvas ref="boardCanvas" width="650" height="500"></canvas>
+    <canvas
+        id="board"
+        ref="boardCanvas"
+        class="hidden"
+    ></canvas>
+
+    <!-- Кнопки управления справа -->
+    <div id="content">
+      <div id="level">Level {{ level }}</div>
+      <div id="score">Score: {{ localScore }}</div>
+      <div>Next</div>
+      <div id="target">Target</div>
+
+      <button
+          id="start"
+          :disabled="startDisabled"
+          @click="onStartClick"
+      >
+        START
+      </button>
+
+      <button
+          id="quick-finish"
+          :disabled="quickFinishDisabled"
+          @click="onQuickFinish"
+      >
+        FINISH LEVEL
+      </button>
+
+      <button
+          id="restart"
+          :disabled="restartDisabled"
+          @click="onRestartLevel"
+      >
+        RESTART LEVEL
+      </button>
     </div>
 
-    <!-- Пример попапа (если нужно) -->
+    <!-- Результат (старый div) -->
+    <div id="result" class="hidden">
+      <p id="level-result">{{ levelResultMessage }}</p>
+      <button
+          id="next"
+          :disabled="nextDisabled"
+          @click="onNext"
+      >
+        {{ nextButtonText }}
+      </button>
+    </div>
+
+    <!-- Таймер -->
+    <div id="timerProgress" class="hidden">
+      <div id="timerBar" ref="timerBar"></div>
+    </div>
+
+    <!-- Картинки труб -->
+    <div class="images">
+      <img id="dirt" src="/pipeManiaSprites/dirt.png" />
+      <img id="pipe0" src="/pipeManiaSprites/0.png" />
+      <img id="pipe1" src="/pipeManiaSprites/1.png" />
+      <img id="pipe2" src="/pipeManiaSprites/2.png" />
+      <img id="pipe3" src="/pipeManiaSprites/3.png" />
+      <img id="pipe4" src="/pipeManiaSprites/4.png" />
+      <img id="pipe5" src="/pipeManiaSprites/5.png" />
+      <img id="pipe6" src="/pipeManiaSprites/6.png" />
+      <img id="pipe7" src="/pipeManiaSprites/7.png" />
+    </div>
+
+    <!-- Попап, где видим монеты (scoreStore.coins) и финальный счет -->
     <GameResultPopup
-        :visible="showPopup"
+        :visible="gameOver"
         :finalScore="finalScore"
         :gainedCoins="gainedCoins"
         @close="closePopup"
@@ -40,104 +91,271 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { usePipeManiaScoreStore } from '@/stores/pipeManiaStore.js'
+import { useFoxStore }   from '@/stores/foxStore.js'
+
+import Game from '@/games/pipemania/game.js'
 import GameResultPopup from '@/components/GameResultPopup.vue'
 
-// Импортируем классы из папки pipemania
-import Game from '@/games/pipemania/Game.js'
+const COIN_RATIO = 0.01;
 
 export default {
-  name: "PipeManiaGame",
+  name: 'PipeManiaGame',
   components: { GameResultPopup },
   setup() {
+    const router = useRouter()
+    const scoreStore = usePipeManiaScoreStore()
+    const foxStore   = useFoxStore()
+
     const boardCanvas = ref(null)
-    let context = null
+    const timerBar    = ref(null)
+
+    // локальные reactive
+    const level              = ref(1)
+    const localScore         = ref(0)
+    const levelResultMessage = ref('Completed the level!')
+    const nextButtonText     = ref('Continue')
+
+    const startDisabled       = ref(false)
+    const quickFinishDisabled = ref(true)
+    const restartDisabled     = ref(true)
+    const nextDisabled        = ref(true)
+
+    const gameOver    = ref(false)
+    const finalScore  = ref(0);
+    const gainedCoins = ref(0);
+
     let pipeGame = null
 
-    // Для примера, локальное состояние счёта / попап
-    const currentScore = ref(0)
-    const showPopup    = ref(false)
-    const finalScore   = ref(0)
-    const gainedCoins  = ref(0)
-
     onMounted(() => {
-      if(!boardCanvas.value) return
-      context = boardCanvas.value.getContext('2d')
+      const canvas = boardCanvas.value
+      canvas.width  = 650
+      canvas.height = 500
+      const ctx = canvas.getContext('2d')
 
-      // Создаём игру
-      pipeGame = new Game(context)
+      // Создаём Game
+      pipeGame = new Game(ctx, {
+        // Когда вода протекает ещё +10 к очкам:
+        onAddScore(points) {
+          scoreStore.addScore(points)
+          localScore.value = scoreStore.score
+        },
+        // Когда игра закончилась
+        onGameEnd(resultType, newLevel, neededPoints) {
+          // (1) Записываем finalScore
+          finalScore.value = scoreStore.score
+
+          if (resultType === 'winner') {
+            // (2) +300 очков за прохождение уровня
+            scoreStore.addScore(300)
+            localScore.value = scoreStore.score
+
+            // (3) при желании ещё конвертируем часть в монеты
+            // scoreStore.addCoins(Math.floor(300 * 0.01)) // если хотим +3 coins
+
+            levelResultMessage.value = 'Level completed!'
+            nextButtonText.value     = 'Continue'
+            level.value = newLevel
+          }
+          else if (resultType === 'game over') {
+            scoreStore.resetCoins()
+            levelResultMessage.value = 'Game Over!'
+            nextButtonText.value     = 'Try Again'
+            level.value = 1
+          }
+          else {
+            // not enough
+            scoreStore.resetCoins()
+            levelResultMessage.value = `Needed ${neededPoints} points!`
+            nextButtonText.value = 'Try Again'
+          }
+        }
+      })
     })
 
-    // При размонтировании (необязательно)
-    onUnmounted(() => {
-      // очистка listeners, cancelAnimationFrame...
-    })
+    // ---------- Методы ----------
+    function onStartClick() {
+      boardCanvas.value.classList.remove('hidden')
+      document.getElementById('timerProgress').classList.remove('hidden')
 
-    function startGame() {
-      if(!pipeGame) return
-      pipeGame.start()
+      startDisabled.value       = true
+      quickFinishDisabled.value = false
+      restartDisabled.value     = false
+
+      // Сбросим очки и монеты
+      scoreStore.resetScore()
+      localScore.value = 0
+
+      pipeGame?.start()
     }
 
-    function restartGame() {
-      if(!pipeGame) return
-      pipeGame.end()
+    function onQuickFinish() {
+      pipeGame?.finishLevel()
+    }
+
+    function onRestartLevel() {
+      scoreStore.resetScore()
+      localScore.value = 0
+      pipeGame?.end()
+    }
+
+    function onNext() {
+      document.getElementById('result').classList.add('hidden')
+      nextDisabled.value = true
+      pipeGame?.setupGame()
+      pipeGame?.round()
     }
 
     function exitGame() {
-      // например, переход в меню
-      // router.push({ name:'MainMenu' })
+      // Останавливаем
+      pipeGame?.end()
+
+      // Переносим локальные монеты -> foxStore
+      if (localScore.value > 0) {
+        foxStore.addCoins(localScore.value * COIN_RATIO)
+      }
+
+      // Показываем попап
+      gameOver.value   = true
+      finalScore.value = localScore.value
+      gainedCoins.value = finalScore.value * COIN_RATIO;
     }
 
     function closePopup() {
-      showPopup.value = false
+      gameOver.value = false;
+      finalScore.value = 0;
+      gainedCoins.value = 0;
+      scoreStore.resetCoins();
+      scoreStore.resetScore();
+      router.push({ name: 'MainMenu' })
+    }
+
+    function restartGame() {
+      gameOver.value = false
+      localScore.value = 0
+      scoreStore.resetCoins()
+      finalScore.value = 0;
+      gainedCoins.value = 0;
+      scoreStore.resetCoins();
+      scoreStore.resetScore();
+      pipeGame?.end()
     }
 
     return {
+      scoreStore, foxStore,
+
       boardCanvas,
-      currentScore,
-      showPopup,
+      timerBar,
+
+      level,
+      localScore,
+      levelResultMessage,
+      nextButtonText,
+
+      startDisabled,
+      quickFinishDisabled,
+      restartDisabled,
+      nextDisabled,
+
+      gameOver,
       finalScore,
       gainedCoins,
 
-      startGame,
-      restartGame,
+      onStartClick,
+      onQuickFinish,
+      onRestartLevel,
+      onNext,
       exitGame,
-      closePopup
+      closePopup,
+      restartGame
     }
   }
 }
 </script>
 
 <style scoped>
-.pipe-mania-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-}
 .ui-overlay {
   display: flex;
   gap: 1rem;
+  padding: 1rem;
   background: #333;
   color: #fff;
-  padding: 1rem;
   align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 999;
 }
 .score-display {
-  font-size:1.2rem;
+  font-size: 1.2rem;
+  display: flex;
+  gap: 15px;
 }
 .exit-button {
-  padding:0.5rem 1rem;
-  background-color:red;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
+  padding: 0.5rem 1rem;
+  background-color: red;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
-.canvas-wrapper {
-  flex-grow:1;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+
+#pipe-mania {
+  display: grid;
+  grid-template-columns: 1fr 700px 1fr;
+  grid-template-rows: 80px 500px 1fr;
+}
+
+canvas {
+  grid-area: 2 / 2;
+  margin-left: 80px;
+}
+.hidden {
+  opacity: 0;
+  z-index: -10;
+}
+
+#content {
+  grid-area: 2 / 2;
+  width: 100px;
+  z-index: 10;
+  justify-self: right;
+  background: transparent;
+  padding: 1rem;
+  text-align: center;
+}
+
+#result {
+  grid-area: 2 / 2;
+  margin-top: 100px;
+  width: 300px;
+  height: 200px;
+  background-color: white;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+#timerProgress {
+  grid-area: 3 / 2;
+  justify-self: center;
+  width: 90%;
+  background-color: #E0E0D1;
+  border-radius: 6px;
+}
+#timerBar {
+  width: 1%;
+  height: 30px;
+  background-color: #00CC66;
+  border-radius: 6px;
+}
+
+.images img {
+  position: absolute;
+  top: 0;
+  opacity: 0;
 }
 </style>

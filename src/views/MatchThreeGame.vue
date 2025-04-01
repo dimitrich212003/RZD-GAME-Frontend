@@ -3,7 +3,8 @@
     <!-- Панель со счётом, кнопкой «Выйти» -->
     <div class="ui-overlay">
       <div class="score-display">
-        Score: {{ scoreStore.score }}
+        <p>Очки: {{ scoreStore.score }}</p>
+        <p>Рекорд: {{ scoreStore.matchThreeBestScore }}</p>
       </div>
       <button class="exit-button" @click="exitGame">Выйти в меню</button>
     </div>
@@ -23,7 +24,7 @@
 
 <script>
 import { onMounted, ref } from 'vue'
-import { useScoreStore } from '@/stores/matchTreeScoreStore'
+import { useMatchThreeScoreStore } from '@/stores/matchThreeScoreStore'
 import { useFoxStore } from '@/stores/foxStore'
 import { useRouter } from 'vue-router'
 import { App } from '@/games/match3/system/App.js'
@@ -35,7 +36,7 @@ export default {
   components: { GameResultPopup }, // Регистрируем
   setup() {
     const container = ref(null)
-    const scoreStore = useScoreStore()
+    const scoreStore = useMatchThreeScoreStore()
     const foxStore = useFoxStore()
     const router = useRouter()
 
@@ -110,6 +111,8 @@ export default {
 }
 .score-display {
   font-size: 1.2rem;
+  display: flex;
+  gap: 15px;
 }
 .exit-button {
   padding: 0.5rem 1rem;
