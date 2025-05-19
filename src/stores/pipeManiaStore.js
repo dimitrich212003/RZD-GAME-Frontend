@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useAchievementsStore } from '@/stores/achievementsStore';
+import {useFoxStore} from "@/stores/foxStore";
 
 
 export const usePipeManiaScoreStore = defineStore('pipeManiaStore', {
@@ -10,6 +11,13 @@ export const usePipeManiaScoreStore = defineStore('pipeManiaStore', {
     }),
     actions: {
         addScore(amount) {
+            const foxStore = useFoxStore();
+
+            if (!foxStore.foxId) {
+                console.error('Fox ID не найден!');
+                return;
+            }
+
             this.score += amount
 
             if(this.score > this.pipeManiaBestScore) {
@@ -18,10 +26,10 @@ export const usePipeManiaScoreStore = defineStore('pipeManiaStore', {
 
             const achievementsStore = useAchievementsStore();
             if (this.score >= 900) {
-                achievementsStore.unlockAchievement(6);
+                achievementsStore.unlockAchievement(foxStore.foxId,5);
             }
             if (this.score >= 4500) {
-                achievementsStore.unlockAchievement(6);
+                achievementsStore.unlockAchievement(foxStore.foxId,6);
             }
         },
         resetScore() {

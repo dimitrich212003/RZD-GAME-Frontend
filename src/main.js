@@ -15,7 +15,7 @@ const pinia = createPinia()
 app.use(pinia)
 app.use(router)
 
-// 3. Теперь вызываем наш store
+// 3. Теперь вызываем store для хранения данных лисенка
 const store = useFoxStore()
 
 // 4. Загружаем данные из LocalStorage (если это нужно до начала работы)

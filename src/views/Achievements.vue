@@ -41,7 +41,8 @@
 import NavBar from "@/components/NavBar";
 import Logo from "@/components/Logo";
 import { useAchievementsStore } from "@/stores/achievementsStore";
-import { computed, ref } from "vue";
+import {computed, onMounted, ref} from "vue";
+import {useFoxStore} from "@/stores/foxStore";
 
 export default {
   name: "AchievementsComponent",
@@ -51,6 +52,7 @@ export default {
   },
   setup() {
     const achievementsStore = useAchievementsStore();
+    const foxStore = useFoxStore();
     const achievements = computed(() => achievementsStore.achievements);
 
     const expandedId = ref(null);
@@ -58,6 +60,14 @@ export default {
     const toggleAchievement = (id) => {
       expandedId.value = (expandedId.value === id) ? null : id;
     };
+
+    onMounted(async () => {
+      if (!foxStore.foxId) {
+        console.error('Fox ID не сохранено');
+        return;
+      }
+      await achievementsStore.syncAchievements(foxStore.foxId);
+    });
 
     return {
       achievements,

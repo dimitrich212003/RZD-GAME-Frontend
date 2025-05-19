@@ -29,7 +29,8 @@ import { useFoxStore } from '@/stores/foxStore'
 import { useRouter } from 'vue-router'
 import { App } from '@/games/match3/system/App.js'
 import { Config } from '@/games/match3/game/Config.js'
-import GameResultPopup from '@/components/GameResultPopup.vue' // <-- Вот компонент
+import GameResultPopup from '@/components/GameResultPopup.vue'
+import axios from "axios"; // <-- Вот компонент
 
 export default {
   name: 'MatchThreeGame',
@@ -45,8 +46,13 @@ export default {
     const finalScore = ref(0)
     const gainedCoins = ref(0)
 
-    onMounted(() => {
+    onMounted(async () => {
       if (!container.value) return;
+
+      if (!foxStore.foxId) {
+        console.error('Fox ID не сохранено');
+        return;
+      }
 
       scoreStore.resetScore()
       Config.scoreStore = scoreStore
@@ -64,12 +70,27 @@ export default {
           })
         }
       }, 100)
+      try {
+        const game = 'matchThreeStore'
+        const response = await axios.get(`http://localhost:8585/api/record/${foxStore.foxId}/${game}`)
+        scoreStore.setMatchThreeBestScore(response.data.score)
+        console.log('Рекорд Запрошен с сервера', response.data);
+
+      } catch (error) {
+        console.error('Ошибка получения рекорда: ', error)
+      }
     })
 
     // Завершить игру (вызвать endGame)
-    function exitGame() {
+    async function exitGame() {
+      if (gainedCoins.value > 0) {
+        await foxStore.addCoins(gainedCoins.value);
+      } else {
+        console.warn('Нельзя добавить 0 или отрицательное количество монет');
+      }
+
       if (App.scene && App.scene.endGame) {
-        App.scene.endGame()
+        App.scene.endGame();
       }
     }
 

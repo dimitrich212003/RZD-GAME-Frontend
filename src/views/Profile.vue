@@ -88,7 +88,8 @@ import Logo from "@/components/Logo";
 import SwapButton from "@/components/SwapButton";
 import { useFoxStore } from "@/stores/foxStore";
 import { useDifficultyStore } from "@/stores/difficultyStore";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import axios from "axios";
 
 export default {
   name: "ProfileComponent",
@@ -117,9 +118,28 @@ export default {
       tempName.value = foxStore.foxName; // подставляем текущее имя
     };
 
-    const saveName = () => {
-      foxStore.setFoxName(tempName.value);
-      isEditingName.value = false;
+    const saveName = async () => {
+      if (!foxStore.foxId) {
+        console.error('Fox ID не сохранено');
+        return;
+      }
+
+      try {
+        const currentLevel = difficultyStore.difficultyLevel;
+        const response = await axios.put(`http://localhost:8585/api/fox/updateName/${foxStore.foxId}`, tempName.value.trim(),
+            {
+              headers: {
+                'Content-Type': 'text/plain'
+              }
+            });
+
+        foxStore.setFoxName(response.data.name);
+        difficultyStore.setDifficulty(currentLevel);
+        isEditingName.value = false;
+      } catch (error) {
+        console.error('Ошибка обновлении имени лисёнка:', error);
+        showError.value = true;
+      }
     };
 
     const isValid = computed(() => {
@@ -210,9 +230,28 @@ export default {
       };
     });
 
+    onMounted(async () => {
+      if (!foxStore.foxId) {
+        console.error('Fox ID не сохранено');
+        return;
+      }
+      if (!difficultyStore.difficultyLevel) {
+        difficultyStore.setDifficulty('easy');
+      }
 
-
-
+      try {
+        const response = await axios.get(`http://localhost:8585/api/fox/${foxStore.foxId}`);
+        foxStore.setFoxName(response.data.name);
+        foxStore.setCoins(response.data.coins);
+        difficultyStore.setDifficulty(response.data.gameLevel);
+      } catch (error) {
+        if (error.response?.status === 404) {
+          console.error('Такого лисенка не существует: ', error);
+        } else {
+          console.error('Ошибка загрузки данных: ', error);
+        }
+      }
+    });
 
     return {
       foxStore,

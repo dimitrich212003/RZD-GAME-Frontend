@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import axios from "axios";
 
 export const useAchievementsStore = defineStore("achievementsStore", {
     state: () => ({
@@ -71,13 +72,39 @@ export const useAchievementsStore = defineStore("achievementsStore", {
                 description: "Пройдите все уровни в Лисенке проводнике",
             },
         ],
+        templates: [
+        ]
     }),
     actions: {
-        unlockAchievement(achievementId) {
-            const achievement = this.achievements.find(a => a.id === achievementId);
-            if (achievement && !achievement.unlocked) {
+        async unlockAchievement(foxId, achievementId) {
+            try {
+                const achievement = this.achievements.find(a => a.id === achievementId);
+                if (!achievement) return;
+
+                await axios.put(`http://localhost:8585/api/achievement/${foxId}/unlock`, achievementId,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
                 achievement.unlocked = true;
+            } catch (error) {
+                console.error('Ошибка разблокировки:', error);
+                throw error;
             }
         },
+        async syncAchievements(foxId) {
+            try {
+                const response = await axios.get(`http://localhost:8585/api/achievement/${foxId}`);                response.data.forEach(serverAchievement => {
+                    const localAchievement = this.achievements.find(a => a.id === serverAchievement.code);
+                    if (localAchievement) {
+                        localAchievement.unlocked = serverAchievement.unlocked;
+                    }
+                });
+            } catch (error) {
+                console.error('Ошибка синхронизации достижений:', error);
+                throw error;
+            }
+        }
     },
 });

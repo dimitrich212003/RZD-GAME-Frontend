@@ -51,6 +51,8 @@ import { useFoxStore } from '@/stores/foxStore';
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
 import Logo from "@/components/Logo";
+import {useDifficultyStore} from "@/stores/difficultyStore";
+import axios from 'axios';
 
 export default {
   name: 'EnterName',
@@ -60,6 +62,8 @@ export default {
   setup() {
     const router = useRouter();
     const foxStore = useFoxStore();
+    const difficultyStore = useDifficultyStore();
+
 
     const localName = ref('');
     const showError = ref(false);
@@ -109,13 +113,35 @@ export default {
     };
 
     // Сабмит формы
-    const submitName = () => {
+    const submitName = async () => {
       if (!isValid.value) {
         showError.value = true;
         return;
       }
-      foxStore.setFoxName(localName.value.trim());
-      router.push({ name: 'MainMenu' });
+      try {
+        const foxData = {
+          name: localName.value.trim(),
+          gameLevel: difficultyStore.difficultyLevel || 'easy',
+        };
+
+        const response = await axios.post('http://localhost:8585/api/fox', foxData)
+        console.log('Полный ответ сервера:', response.data);
+
+        foxStore.initFox({
+          name: response.data.name,
+          coins: response.data.coins,
+          id: response.data.id
+        });
+        localStorage.setItem('foxId', response.data.id); // Сохраняем ID
+
+
+        console.log("Создали лисенка: " + foxStore.foxName);
+        // 4. Переходим на главный экран
+        router.push({ name: 'MainMenu' });
+
+      } catch (error) {
+        console.error('Ошибка создания лисёнка:', error);
+      }
     };
 
     return {

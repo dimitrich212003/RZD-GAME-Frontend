@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import axios from "axios";
 
 // Пример простого плагина для сохранения в localStorage
 function persistPlugin({ store }) {
@@ -11,13 +12,46 @@ export const useFoxStore = defineStore('foxStore', {
     state: () => ({
         foxName: '',
         totalCoins: 0,
+        foxId: null
     }),
     actions: {
+        setFoxId(id) {
+            this.foxId = id;
+        },
         setFoxName(name) {
             this.foxName = name;
         },
-        addCoins(amount) {
+        setCoins(totalCoins) {
+            this.totalCoins = totalCoins;
+        },
+        async addCoins(amount) {
+            if (amount <= 0) {
+                console.warn('Попытка добавить некорректное количество монет:', amount);
+                return;
+            }
+
             this.totalCoins += amount;
+
+            if (!this.foxId) {
+                console.error('Fox ID не сохранено');
+                return;
+            }
+
+            try {
+                const response = await axios.put(
+                    `http://localhost:8585/api/fox/addCoins/${this.foxId}`,
+                    amount,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
+                this.totalCoins = response.data.coins;
+            } catch (error) {
+                this.totalCoins -= amount;
+                this.error = error.response?.data?.message || 'Failed to add coins';
+            }
         },
         resetCoins() {
             this.totalCoins = 0;
@@ -28,8 +62,14 @@ export const useFoxStore = defineStore('foxStore', {
                 const parsed = JSON.parse(data);
                 this.foxName = parsed.foxName || '';
                 this.totalCoins = parsed.totalCoins ?? 0; // Загружаем монеты или 0
+                this.foxId = parsed.foxId || null; // Добавляем загрузку ID
             }
         },
+        initFox(data) {
+            this.foxName = data.name;
+            this.totalCoins = data.coins;
+            this.foxId = data.id;
+        }
     },
     // Автоматически вызываем плагин
     plugins: [persistPlugin],

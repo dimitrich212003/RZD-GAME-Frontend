@@ -30,6 +30,8 @@ export default class Game {
         const sourcePos = this._randomSourcePos();
         const destPos   = this._randomDestinationPos();
 
+        this.images[6].src = '/pipeManiaSprites/0_active.png';
+
         this.board = new Board(this.images, sourcePos, destPos);
         this.pipeQueue = [ new Pipe(), new Pipe(), new Pipe() ];
 
@@ -47,6 +49,9 @@ export default class Game {
         for (let i=0; i<7; i++) {
             const el = document.getElementById(`pipe${i}`);
             images.push(el);
+        }
+        for (let i = 0; i < 6; i++) {
+            images.push(document.getElementById(`pipe${i}_active`));
         }
         return images;
     }
@@ -95,6 +100,9 @@ export default class Game {
     }
 
     checkWin(interval=5000){
+        this.images[6].src = '/pipeManiaSprites/0.png';
+
+
         // Каждые interval мс двигаем воду
         this.flowInterval = setInterval(() => {
             const won = this.board.checkWin(this.flowInterval);

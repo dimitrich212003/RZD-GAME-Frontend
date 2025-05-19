@@ -5,8 +5,20 @@
 </template>
 
 <script>
+import { useFoxStore } from '@/stores/foxStore';
+import { onMounted } from 'vue';
+
 export default {
   name: 'App',
+  setup() {
+    const foxStore = useFoxStore();
+    onMounted(() => {
+      const savedFoxId = localStorage.getItem('foxId');
+      if (savedFoxId) {
+        foxStore.setFoxId(savedFoxId);
+      }
+    });
+  }
 };
 </script>
 

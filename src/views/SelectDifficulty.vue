@@ -28,6 +28,7 @@ import { useDifficultyStore } from '@/stores/difficultyStore';
 import { useFoxStore } from '@/stores/foxStore';
 import { useRouter } from 'vue-router';
 import Logo from "@/components/Logo";
+import axios from "axios";
 
 export default {
   name: 'SelectDifficulty',
@@ -37,13 +38,30 @@ export default {
     const foxStore = useFoxStore();
     const router = useRouter();
 
-    const chooseLevel = (level) => {
-      difficultyStore.setDifficulty(level);
-      foxStore.loadFromLocalStorage();
+    const chooseLevel = async (level) => {
       if (foxStore.foxName) {
-        router.push({ name: 'Profile' });
+        if (!foxStore.foxId) {
+          console.error('Fox ID не сохранено');
+          return;
+        }
+
+        try {
+          const response = await axios.put(`http://localhost:8585/api/fox/updateGameLevel/${foxStore.foxId}`, level,
+              {
+                headers: {
+                  'Content-Type': 'text/plain'
+                }
+              });
+
+          difficultyStore.setDifficulty(response.data.gameLevel);
+          await router.push({name: 'Profile'});
+        } catch (error) {
+          console.error('Ошибка обновлении сложности игры:', error);
+        }
       } else {
-        router.push({ name: 'EnterName' });
+        difficultyStore.setDifficulty(level);
+        foxStore.loadFromLocalStorage();
+        await router.push({name: 'EnterName'});
       }
     };
 

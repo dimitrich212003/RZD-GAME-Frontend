@@ -1,14 +1,15 @@
 export default class Pellet {
-    constructor({ position }) {
+    constructor({ position, sprite }) {
         this.position = position
-        this.radius = 3
+        this.sprite = sprite
+        this.radius = 8
     }
 
-    draw(context) {
-        context.beginPath()
-        context.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
-        context.fillStyle = 'black'
-        context.fill()
-        context.closePath()
+    draw(ctx) {
+        ctx.drawImage(this.sprite,
+            this.position.x - this.radius,
+            this.position.y - this.radius,
+            this.radius * 2,
+            this.radius * 2)
     }
 }

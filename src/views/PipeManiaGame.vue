@@ -1,7 +1,5 @@
 <template>
-  <!-- Верхняя панель (Score + кнопка «Выйти в меню») -->
   <div class="ui-overlay">
-    <!-- Показываем текущее scoreStore.score -->
     <div class="score-display">
       <p>Очки: {{ scoreStore.score }}</p>
       <p>Рекорд: {{ scoreStore.pipeManiaBestScore }}</p>
@@ -10,42 +8,42 @@
   </div>
 
   <div id="pipe-mania">
-    <!-- Canvas -->
     <canvas
         id="board"
         ref="boardCanvas"
         class="hidden"
     ></canvas>
 
-    <!-- Кнопки управления справа -->
     <div id="content">
-      <div id="level">Level {{ level }}</div>
-      <div id="score">Score: {{ localScore }}</div>
-      <div>Next</div>
-      <div id="target">Target</div>
+      <div id="level">Уровень: {{ level }}</div>
+      <div id="score">Очки: {{ localScore }}</div>
+      <div style="display: none">Следующая</div>
+      <div style="display: none" id="target">цель</div>
 
       <button
+          style="width: 120px; margin-bottom: 10px;"
           id="start"
           :disabled="startDisabled"
           @click="onStartClick"
       >
-        START
+        Старт
       </button>
 
-      <button
+      <button style="width: 120px; margin-bottom: 10px;"
           id="quick-finish"
           :disabled="quickFinishDisabled"
           @click="onQuickFinish"
       >
-        FINISH LEVEL
+        Завершить уровень
       </button>
 
       <button
+          style="width: 120px"
           id="restart"
           :disabled="restartDisabled"
           @click="onRestartLevel"
       >
-        RESTART LEVEL
+        Начать заного
       </button>
     </div>
 
@@ -75,8 +73,14 @@
       <img id="pipe3" src="/pipeManiaSprites/3.png" />
       <img id="pipe4" src="/pipeManiaSprites/4.png" />
       <img id="pipe5" src="/pipeManiaSprites/5.png" />
-      <img id="pipe6" src="/pipeManiaSprites/6.png" />
+      <img id="pipe6" src="/pipeManiaSprites/0_active.png" />
       <img id="pipe7" src="/pipeManiaSprites/7.png" />
+      <img id="pipe0_active" src="/pipeManiaSprites/0_active.png" />
+      <img id="pipe1_active" src="/pipeManiaSprites/1_active.png" />
+      <img id="pipe2_active" src="/pipeManiaSprites/2_active.png" />
+      <img id="pipe3_active" src="/pipeManiaSprites/3_active.png" />
+      <img id="pipe4_active" src="/pipeManiaSprites/4_active.png" />
+      <img id="pipe5_active" src="/pipeManiaSprites/5_active.png" />
     </div>
 
     <!-- Попап, где видим монеты (scoreStore.coins) и финальный счет -->
@@ -324,6 +328,10 @@ canvas {
   background: transparent;
   padding: 1rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
 }
 
 #result {

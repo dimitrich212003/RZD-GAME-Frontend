@@ -1,26 +1,30 @@
 export default class Ghost {
     static speed = 1.5
 
-    constructor({ position, velocity, color = 'red' }) {
+    constructor({ position, velocity, sprites }) {
         this.position = position
         this.velocity = velocity
-        this.radius = 15
-        this.color = color
+        this.sprites  = sprites             // { active, inactive }
+        this.radius   = 15
         this.prevCollisions = []
-        this.speed = 1.5
-        this.scared = false
+        this.speed    = 1.5
+        this.scared   = false
     }
 
-    draw(context) {
-        context.beginPath()
-        context.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
-        context.fillStyle = this.scared ? 'blue' : this.color
-        context.fill()
-        context.closePath()
+    draw(ctx) {
+        const img = this.scared
+            ? this.sprites.inactive
+            : this.sprites.active
+
+        ctx.drawImage(img,
+            this.position.x - this.radius,
+            this.position.y - this.radius,
+            this.radius * 2,
+            this.radius * 2)
     }
 
-    update(context) {
-        this.draw(context)
+    update(ctx) {
+        this.draw(ctx)
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
     }

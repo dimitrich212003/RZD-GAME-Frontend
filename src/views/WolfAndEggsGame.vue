@@ -13,9 +13,8 @@
       <main class="page">
         <div class="container">
           <div class="game">
-            <!-- Солнце -->
-            <div id="sun"></div>
 
+            <div id="sun" style="display: none;"></div>
             <!-- СЧЁТ -->
             <div id="score">
               <span>Спасено</span>
@@ -32,8 +31,7 @@
             <!-- ЛЕВАЯ ВЕРХНЯЯ -->
             <div id="chicken-left-up">
               <div class="chicken-left-up__wrap">
-                <div class="chicken-left"></div>
-                <div class="pomost-left"></div>
+                <div class="pomost-left-up"></div>
               </div>
             </div>
             <div id="CLU-touch"></div>
@@ -41,8 +39,7 @@
             <!-- ЛЕВАЯ НИЖНЯЯ -->
             <div id="chicken-left-down">
               <div class="chicken-left-down__wrap">
-                <div class="chicken-left"></div>
-                <div class="pomost-left"></div>
+                <div class="pomost-left-down"></div>
               </div>
             </div>
             <div id="CLD-touch"></div>
@@ -50,8 +47,7 @@
             <!-- ПРАВАЯ ВЕРХНЯЯ -->
             <div id="chicken-right-up">
               <div class="chicken-right-up__wrap">
-                <div class="chicken-right"></div>
-                <div class="pomost-right"></div>
+                <div class="pomost-right-up"></div>
               </div>
             </div>
             <div id="CRU-touch"></div>
@@ -59,8 +55,7 @@
             <!-- ПРАВАЯ НИЖНЯЯ -->
             <div id="chicken-right-down">
               <div class="chicken-right-down__wrap">
-                <div class="chicken-right"></div>
-                <div class="pomost-right"></div>
+                <div class="pomost-right-down"></div>
               </div>
             </div>
             <div id="CRD-touch"></div>
@@ -393,7 +388,7 @@ export default {
         eggCount++;
 
         if(eggCount >= 50) {
-          achievementsStore.unlockAchievement(7);
+          achievementsStore.unlockAchievement(foxStore.foxId, 7);
         }
 
         const newEgg = createEgg(nest)
@@ -497,7 +492,7 @@ export default {
         if (score === 90) { level = 10; doSunRotateOnce(); scoreStore.addScore(300); }
         if (score === 99) {
           scoreStore.addScore(300);
-          achievementsStore.unlockAchievement(8);
+          achievementsStore.unlockAchievement(foxStore.foxId, 8);
           youWin();
         }
       }
@@ -694,7 +689,7 @@ export default {
   border-radius: 10px;
   box-shadow: 0 0 50px 1px #69c0fa;
   min-height: 660px;
-  background-image: url("@/assets/WolfAndEggsSprites/bg.jpeg");
+  background-image: url("@/assets/WolfAndEggsSprites/bg.png");
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -704,8 +699,8 @@ export default {
 :deep(.game .egg) {
   --rolling-time: 2500ms;
   --falling-time: 250ms;
-  --egg-size: 30px;
-  --egg-cracked-size: 48px;
+  --egg-size: 60px;
+  --egg-cracked-size: 70px;
   position: absolute;
   width: var(--egg-size);
   height: var(--egg-size);
@@ -715,21 +710,21 @@ export default {
 }
 
 :deep(.game .egg-white) {
-  background-image: url("@/assets/WolfAndEggsSprites/egg-white.png");
+  background-image: url("@/assets/WolfAndEggsSprites/bag-point.png");
 }
 :deep(.game .egg-brown) {
-  background-image: url("@/assets/WolfAndEggsSprites/egg-brown.png");
+  background-image: url("@/assets/WolfAndEggsSprites/bag-orange.png");
 }
 
 :deep(.game .egg-smile) {
-  background-image: url("@/assets/WolfAndEggsSprites/egg-smile.png");
+  background-image: url("@/assets/WolfAndEggsSprites/bag-point.png");
 }
 
 :deep(.game .egg-left.cracked),
 :deep(.game .egg-right.cracked) {
   width: var(--egg-cracked-size);
   height: var(--egg-cracked-size);
-  background-image: url("@/assets/WolfAndEggsSprites/egg-white-bad.png");
+  background-image: url("@/assets/WolfAndEggsSprites/bag-open.png");
 }
 
 :deep(.game #lives) {
@@ -742,13 +737,13 @@ export default {
 :deep(.game #lives ul) {
   display: inline-flex;
   align-items: center;
-  gap: 0rem;
+  gap: 0.3rem;
 }
 
 :deep(.game #lives ul li) {
   width: 2rem;
   height: 2rem;
-  background-image: url("@/assets/WolfAndEggsSprites/egg-smile.png");
+  background-image: url("@/assets/WolfAndEggsSprites/bag-point.png");
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -948,23 +943,37 @@ export default {
 #chicken-right-down { top: 52%; right: 0; }
 .chicken-right-down__wrap { position: relative; }
 /* Помосты */
-.pomost-left,
-.pomost-right {
+.pomost-left-up,
+.pomost-right-up,
+.pomost-left-down,
+.pomost-right-down {
   position: absolute;
   top: 63%;
-  width: 140px;
-  height: 70px;
+  width: 230px;
+  height: 120px;
   background-position: center center;
   background-size: contain;
   background-repeat: no-repeat;
 }
-.pomost-left {
-  left: -1rem;
-  background-image: url("@/assets/WolfAndEggsSprites/pomost-left.png");
+.pomost-left-up {
+  left: -4rem;
+  top: -4rem;
+  background-image: url("@/assets/WolfAndEggsSprites/pomost_lu.png");
 }
-.pomost-right {
-  right: -1rem;
-  background-image: url("@/assets/WolfAndEggsSprites/pomost-right.png");
+.pomost-right-up {
+  right: -4rem;
+  top: -4rem;
+  background-image: url("@/assets/WolfAndEggsSprites/pomost_ru.png");
+}
+.pomost-left-down {
+  left: -4rem;
+  top: 1rem;
+  background-image: url("@/assets/WolfAndEggsSprites/pomost_ld.png");
+}
+.pomost-right-down {
+  right: -4rem;
+  top: 1rem;
+  background-image: url("@/assets/WolfAndEggsSprites/pomost_rd.png");
 }
 /* Картинки куриц */
 .chicken-left,
@@ -998,21 +1007,28 @@ export default {
 
 #wolf {
   position: absolute;
-  top: 52%;
+  top: 45%;
   left: 50%;
   transform: translateX(-50%);
-  width: 160px;
-  height: 160px;
-  background-image: url("@/assets/WolfAndEggsSprites/wolf-sprite.png");
-  background-size: cover;
+  width: 220px;
+  height: 264px;
+  background-position: center;
+  background-size: contain;
   background-repeat: no-repeat;
 }
-#wolf.rc { background-position: 60.2% center; }
-#wolf.lc { background-position: 0% center; }
-#wolf.ru { background-position: 100.4% center; }
-#wolf.rd { background-position: 80% center; }
-#wolf.lu { background-position: 40% center; }
-#wolf.ld { background-position: 19.6% center; }
+#wolf.rc { background-image: url('@/assets/WolfAndEggsSprites/fox_rc.png'); }
+#wolf.lc { background-image: url('@/assets/WolfAndEggsSprites/fox_lc.png'); }
+#wolf.ru { background-image: url('@/assets/WolfAndEggsSprites/fox_ru.png'); }
+#wolf.rd {
+  background-image: url('@/assets/WolfAndEggsSprites/fox_rd.png');
+  top: 52%;
+}
+#wolf.lu { background-image: url('@/assets/WolfAndEggsSprites/fox_lu.png'); }
+#wolf.ld {
+  background-image: url('@/assets/WolfAndEggsSprites/fox_ld.png');
+  top: 52%;
+}
+
 
 #pause {
   position: absolute;

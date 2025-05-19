@@ -58,6 +58,13 @@ export default {
     const finalScore = ref(0)
     const gainedCoins = ref(0)
 
+    const SPRITES = {
+      player        : createImage('/pacmanSprites/player.png'),
+      ghostActive   : createImage('/pacmanSprites/ghost-active.png'),
+      ghostInactive : createImage('/pacmanSprites/ghost-inactive.png'),
+      coin          : createImage('/pacmanSprites/coin.png'),
+    }
+
     let handleKeyDown, handleKeyUp;
     let animationId;
     let context;
@@ -93,7 +100,6 @@ export default {
       context.translate(offsetX, offsetY);
 
       if(keys.w.pressed && lastKey === 'w') {
-        console.log('w');
         for (let i = 0; i < boundaries.length; i++) {
           const boundary = boundaries[i];
           if (circleCollidesWithRectanglePlayer({
@@ -302,7 +308,6 @@ export default {
           const pathways = ghost.prevCollisions.filter((collision) => {
             return !collisions.includes(collision);
           });
-          console.log({pathways});
 
 
           const direction = pathways[Math.floor(Math.random() * pathways.length)];
@@ -330,17 +335,19 @@ export default {
         }
       })
 
-      if(player.velocity.x > 0) {
-        player.rotation = 0;
-      }
-      else if(player.velocity.x < 0) {
-        player.rotation = Math.PI;
-      }
-      else if(player.velocity.y > 0) {
-        player.rotation = Math.PI / 2;
-      }
-      else if(player.velocity.y < 0) {
-        player.rotation = Math.PI * 1.5;
+      switch (lastKey) {
+        case 'd':
+          player.rotation = Math.PI * 1.5;
+          break;
+        case 'a':
+          player.rotation = Math.PI / 2;
+          break;
+        case 's':
+          player.rotation = 0
+          break;
+        case 'w':
+          player.rotation = Math.PI
+          break;
       }
 
       context.restore();
@@ -381,7 +388,8 @@ export default {
             x: Ghost.speed,
             y: 0
           },
-          color: 'red',
+          sprites : { active: SPRITES.ghostActive,
+            inactive: SPRITES.ghostInactive }
         }),
         new Ghost({
           position: {
@@ -392,7 +400,8 @@ export default {
             x: Ghost.speed,
             y: 0
           },
-          color: 'pink',
+          sprites : { active: SPRITES.ghostActive,
+            inactive: SPRITES.ghostInactive }
         }),
         new Ghost({
           position: {
@@ -403,7 +412,8 @@ export default {
             x: Ghost.speed,
             y: 0
           },
-          color: 'green',
+          sprites : { active: SPRITES.ghostActive,
+            inactive: SPRITES.ghostInactive }
         }),
 
       ];
@@ -416,7 +426,8 @@ export default {
         velocity: {
           x: 0,
           y: 0
-        }
+        },
+        sprite: SPRITES.player
       });
 
       map.forEach((row, i) => {
@@ -607,7 +618,8 @@ export default {
                     position: {
                       x: j * Boundary.width + Boundary.width / 2,
                       y: i * Boundary.height + Boundary.height / 2
-                    }
+                    },
+                    sprite: SPRITES.coin
                   })
               )
               break
@@ -626,6 +638,7 @@ export default {
       });
 
       handleKeyDown = ({ key }) => {
+        console.log('keydown', key)
         switch (key) {
           case 'w':
             keys.w.pressed = true
@@ -647,6 +660,7 @@ export default {
       };
 
       handleKeyUp = ({ key }) => {
+        console.log('keyup', key)
         switch (key) {
           case 'w':
             keys.w.pressed = false

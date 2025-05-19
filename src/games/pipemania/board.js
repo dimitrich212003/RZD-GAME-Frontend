@@ -10,7 +10,7 @@ export default class Board {
         this.sourcePos = sourcePos;
         this.destinationPos = destinationPos;
         this.points = 0;
-        this.images = images; // массив картинок [pipe0, pipe1 ...]
+        this.images = images;
         // dirt-картинка (фон), можно взять через document.getElementById('dirt')
         //   либо, если Vue: ref на <img id="dirt" /> в шаблоне
         this.dirt = document.getElementById("dirt");
@@ -50,37 +50,54 @@ export default class Board {
         }
     }
 
-    // Двигаем воду из currentPipe -> nextPipe. Если дошли до destination => победа
+    // Двигаем  из currentPipe -> nextPipe. Если дошли до destination => победа
     checkWin(interval) {
+        this.images[6].src = '/pipeManiaSprites/0.png';
+
         const flowDir = this.currentPipe.getFlowDir('out');
-        const move = Pipe.MOVES[flowDir];
-        const nextPos=[ this.currentPos[0]+move[0], this.currentPos[1]+move[1] ];
-        let nextPipe;
-        if(this.boundary(nextPos)){
-            nextPipe=this.grid[nextPos[0]][nextPos[1]];
-        }
+        const move    = Pipe.MOVES[flowDir];
+        const nextPos = [this.currentPos[0] + move[0], this.currentPos[1] + move[1]];
 
-        if(nextPipe && this.currentPipe.checkConnection(nextPipe)){
-            nextPipe.resetFlow();
-            this.points += 10;
-            let flowIn=Pipe.complement(flowDir);
-            nextPipe.setFlowIn(flowIn);
-            let flowOut = nextPipe.getFlowDir("");
-            if(flowOut) nextPipe.setFlowOut(flowOut);
-            nextPipe.fill=true;
+        // снимаем «синеву» с текущей трубы — она становится обычной
+        this.currentPipe.fill = false;
 
-            this.currentPos=nextPos;
-            this.currentPipe=nextPipe;
-
-            if(nextPos[0]===this.destinationPos[0] && nextPos[1]===this.destinationPos[1]){
-                clearInterval(interval);
-                return "winner";
-            }
-        } else {
+        // ищем следующую
+        if (!this.boundary(nextPos)) {
             clearInterval(interval);
-            return "game over";
+            return 'game over';
         }
-        return "continue";
+
+        const nextPipe = this.grid[nextPos[0]][nextPos[1]];
+
+        if (nextPipe && this.currentPipe.checkConnection(nextPipe)) {
+            // корректируем потоки
+            nextPipe.resetFlow();
+            const flowIn  = Pipe.complement(flowDir);
+            nextPipe.setFlowIn(flowIn);
+            const flowOut = nextPipe.getFlowDir('');
+            if (flowOut) nextPipe.setFlowOut(flowOut);
+
+            // только ЭТА труба становится активной
+            nextPipe.fill   = true;
+            this.currentPos = nextPos;
+            this.currentPipe = nextPipe;
+
+            this.points += 10;
+
+            // финиш?
+            if (
+                nextPos[0] === this.destinationPos[0] &&
+                nextPos[1] === this.destinationPos[1]
+            ) {
+                clearInterval(interval);
+                return 'winner';
+            }
+
+            return 'continue';
+        }
+
+        clearInterval(interval);
+        return 'game over';
     }
 
     // Рисуем фон (dirt) в каждой клетке
@@ -99,17 +116,28 @@ export default class Board {
         let fillColor='#E0E0D1';
         if(this.checkPos([x,y])) {
             fillColor='#DF2A2A';
-        } else if(pipe.fill) {
-            fillColor='#6EAAE7';
         }
         const width=Board.WIDTH;
         const xPos=x*width;
         const yPos=y*width;
 
+        const ACTIVE_SPRITE = {
+            0: 7,
+            1: 8,
+            2: 9,
+            3: 10,
+            4: 11,
+            5: 12
+        };
+
+        const imgIndex = (pipe.fill && Object.prototype.hasOwnProperty.call(ACTIVE_SPRITE, pipe.img))
+            ? ACTIVE_SPRITE[pipe.img]
+            : pipe.img;
+
         ctx.fillStyle=fillColor;
         ctx.fillRect(xPos,yPos,width,width);
         // pipe.img -> индекс, images[ pipe.img ] -> <img>
-        ctx.drawImage(this.images[pipe.img], xPos,yPos,width,width);
+        ctx.drawImage(this.images[imgIndex], xPos, yPos, width, width);
     }
 
     draw(ctx) {
