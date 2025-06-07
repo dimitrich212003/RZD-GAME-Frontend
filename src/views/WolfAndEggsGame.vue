@@ -7,92 +7,76 @@
     <button class="exit-button" @click="exitGame">Выйти в меню</button>
   </div>
   <div class="wolf-eggs-container">
-
     <div class="service-overlay"></div>
     <div class="wrapper">
       <main class="page">
         <div class="container">
           <div class="game">
-
             <div id="sun" style="display: none;"></div>
-            <!-- СЧЁТ -->
             <div id="score">
               <span>Спасено</span>
               <b>0</b>
             </div>
-
-            <!-- УРОВЕНЬ -->
             <div id="level">
               <span>Уровень</span>
               <b>1</b>
             </div>
-
-            <!-- КУРИЦЫ -->
-            <!-- ЛЕВАЯ ВЕРХНЯЯ -->
             <div id="chicken-left-up">
               <div class="chicken-left-up__wrap">
                 <div class="pomost-left-up"></div>
               </div>
             </div>
             <div id="CLU-touch"></div>
-
-            <!-- ЛЕВАЯ НИЖНЯЯ -->
             <div id="chicken-left-down">
               <div class="chicken-left-down__wrap">
                 <div class="pomost-left-down"></div>
               </div>
             </div>
             <div id="CLD-touch"></div>
-
-            <!-- ПРАВАЯ ВЕРХНЯЯ -->
             <div id="chicken-right-up">
               <div class="chicken-right-up__wrap">
                 <div class="pomost-right-up"></div>
               </div>
             </div>
             <div id="CRU-touch"></div>
-
-            <!-- ПРАВАЯ НИЖНЯЯ -->
             <div id="chicken-right-down">
               <div class="chicken-right-down__wrap">
                 <div class="pomost-right-down"></div>
               </div>
             </div>
             <div id="CRD-touch"></div>
-
-            <!-- ВОЛК -->
             <div id="wolf"></div>
-
-            <!-- КНОПКА: СТАРТ / ПАУЗА -->
             <button id="pause">Старт</button>
-
-            <!-- Блок "жизней" -->
             <div id="lives"></div>
 
-            <!-- Затемнение при паузе -->
             <div class="game-place-lock"></div>
-          </div><!-- .game -->
-        </div><!-- .container -->
-
-        <!-- АУДИО-ФАЙЛЫ -->
+          </div>
+        </div>
         <audio src="/audio/crushed-egg.mp3" id="crash-sound" allow="autoplay"></audio>
         <audio src="/audio/layed-egg.mp3" id="layed-sound" allow="autoplay"></audio>
         <audio src="/audio/pause.mp3" id="pause-sound" allow="autoplay"></audio>
         <audio src="/audio/lost.mp3" id="lost-sound" allow="autoplay"></audio>
         <audio src="/audio/win.mp3" id="win-sound" allow="autoplay"></audio>
       </main>
-
-      <footer class="footer">
-        <!-- По желанию -->
-      </footer>
     </div>
-
     <GameResultPopup
         :visible="isGameOver"
         :finalScore="finalScore"
         :gainedCoins="gainedCoins"
         @close="closePopup"
         @restart="restartGame"
+    />
+    <GameInstructionPopup
+        :visible="showIntro"
+        title="Как играть в «Лисёнок-проводник»"
+        :steps="[
+          { text: 'Управляй лисенком с помощью стрелок', icon: require('@/assets/keys/arrows.png') },
+          { text: 'Лови багаж, падающий с полок купе и помогай пассажирам!', icon: null },
+          { text: 'У тебя есть пять жизней, постарайся не тратить их!', icon: null },
+          { text: 'Чем больше багажа поймаешь - тем больше получишь монеток!', icon:  require('@/assets/coin.png') }
+
+        ]"
+        @start="startGameFromPopup"
     />
   </div>
 </template>
@@ -102,37 +86,33 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFoxStore }   from '@/stores/foxStore.js'
 import { useWolfEggsScoreStore } from '@/stores/wolfAndEggsStore.js'
-import GameResultPopup from '@/components/GameResultPopup.vue'
 import { useAchievementsStore } from '@/stores/achievementsStore';
-
-
+import GameResultPopup from '@/components/GameResultPopup.vue'
+import GameInstructionPopup from '@/components/GameInstructionPopup.vue'
 
 export default {
   name: 'WolfAndEggsGame',
-  components: { GameResultPopup },
+  components: { GameResultPopup, GameInstructionPopup },
 
   setup() {
     const isGameOver = ref(false);
     const finalScore = ref(0);
     const gainedCoins = ref(0);
-
+    const showIntro = ref(true);
     const scoreStore = useWolfEggsScoreStore();
     scoreStore.score = 0;
     const foxStore   = useFoxStore();
     const achievementsStore = useAchievementsStore();
     const router = useRouter();
-
-    // Основные переменные
     let score = 0
     let level = 1
     let lives = 5
-
     let wolfLevel = 'up'
     let wolfSide = 'right'
-    let currPos = 'rc'  // текущая поза волка: "ru", "rd", "lu", "ld", "rc", "lc"
+    let currPos = 'rc'
 
     let speedUpdatePosition = 100
-    let gameProcess = false // пока игра не идёт, ждём "Старт"
+    let gameProcess = false
     let rollingSpeed
     let fallingSpeed
     let resetSpeed
@@ -371,19 +351,17 @@ export default {
           egg.classList.add('egg-brown')
         }
 
-        // левое или правое
         if (nest === nestRD || nest === nestRU) {
           egg.classList.add('egg-right')
         } else {
           egg.classList.add('egg-left')
         }
 
-        // Состояние rolling изначально
+        egg.classList.add('rolling')
         egg.classList.add('rolling')
         return egg
       }
 
-      // Запускаем яйцо
       function startEgg(nest) {
         eggCount++;
 
@@ -394,10 +372,8 @@ export default {
         const newEgg = createEgg(nest)
         nest.appendChild(newEgg)
 
-        // Устанавливаем скорости анимации
         eggSpeed(newEgg)
 
-        // Таймер, когда яйцо "разбивается" (если волк не поймал)
         const fallingTimer = setTimeout(() => {
           newEgg.classList.remove('falling')
           newEgg.classList.add('cracked')
@@ -406,24 +382,20 @@ export default {
           showScore()
         }, fallingSpeed + rollingSpeed)
 
-        // Таймер, когда яйцо удаляется из DOM
         const resetTimer = setTimeout(() => {
           newEgg.remove()
         }, resetSpeed)
 
-        // Переключаем rolling -> falling по окончании "rollingSpeed"
         setTimeout(() => {
           newEgg.classList.remove('rolling')
           newEgg.classList.add('falling')
 
-          // Проверяем, успел ли волк поймать
           if (
               (nest === nestLU && currPos === 'lu') ||
               (nest === nestLD && currPos === 'ld') ||
               (nest === nestRU && currPos === 'ru') ||
               (nest === nestRD && currPos === 'rd')
           ) {
-            // Волк успел поймать
             clearTimeout(fallingTimer)
             clearTimeout(resetTimer)
             newEgg.remove()
@@ -435,7 +407,6 @@ export default {
         }, rollingSpeed)
       }
 
-      // Задаём скорость катания/падения в зависимости от уровня
       function eggSpeed(egg) {
         if (level === 1) levelSet(2500, 250, 1)
         if (level === 2) levelSet(2200, 230, 1)
@@ -455,7 +426,6 @@ export default {
           egg.style.setProperty('--rolling-time', rolling + 'ms')
           egg.style.setProperty('--falling-time', falling + 'ms')
 
-          // При изменении уровня перезапускаем интервал, чтобы ускорить или замедлить
           if (gameProcess) {
             clearInterval(game)
             game = setInterval(nextRandomEgg, rollingSpeed * kef)
@@ -463,7 +433,6 @@ export default {
         }
       }
 
-      // Показ/обновление счёта, уровня, жизней
       function showScore() {
         let livesHTML = '<ul>'
         for (let i = 0; i < lives; i++) {
@@ -475,7 +444,6 @@ export default {
         levelElement.innerHTML = `<span>${level}</span>`
         livesElement.innerHTML = livesHTML
 
-        // Если жизни закончились -> game over
         if (lives <= 0) {
           gameOver()
         }
@@ -503,7 +471,6 @@ export default {
         setTimeout(() => { sunFlag = 0 }, 3000)
       }
 
-      // Игра окончена
       function gameOver() {
         lostSound.play()
         clearInterval(game)
@@ -527,7 +494,6 @@ export default {
         }, 4000)
       }
 
-      // Победа (достигли 99)
       function youWin() {
         winSound.play()
         clearInterval(game)
@@ -556,14 +522,12 @@ export default {
         }, 22000)
       }
 
-      // Генерация случайного числа
       function getRandomInt(min, max) {
         min = Math.ceil(min)
         max = Math.floor(max)
         return Math.floor(Math.random() * (max - min + 1)) + min
       }
 
-      // Всплывающий текст
       anounce = (content, delay) => {
         const element = document.createElement('div')
         const body = document.querySelector('body')
@@ -580,7 +544,6 @@ export default {
         }, delay + 1000)
       }
 
-      // Вращение солнца
       function sunRotate() {
         const s = document.querySelector('#sun')
         s.classList.add('active')
@@ -591,19 +554,26 @@ export default {
       }
     });
 
+    function startGameFromPopup() {
+      showIntro.value = false;
+    }
+
     function exitGame() {
-      // Останавливаем
       pauseElement.disabled = true;
       finalScore.value = scoreStore.score;
       gainedCoins.value = finalScore.value * COIN_RATIO;
       eggCount = 0
       foxStore.addCoins(gainedCoins.value);
-
       isGameOver.value = true;
+      clearInterval(game)
+      gameProcess = false
+      wolf.className = 'rc'
+      currPos = 'rc'
+      pauseElement.disabled = true
     }
 
     function closePopup() {
-      isGameOver.value = false;
+      isGameOver.value = true;
       finalScore.value = 0;
       gainedCoins.value = 0;
       scoreStore.resetScore();
@@ -645,7 +615,9 @@ export default {
       gainedCoins,
       exitGame,
       closePopup,
-      restartGame
+      restartGame,
+      showIntro,
+      startGameFromPopup
     }
   }
 }

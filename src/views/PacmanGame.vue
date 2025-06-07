@@ -7,19 +7,28 @@
       </div>
       <button class="exit-button" @click="exitGame">Выйти в меню</button>
     </div>
-
     <div class="game-field-wrapper">
       <div class="game-field">
         <canvas ref="gameCanvas" class="pacman-canvas"></canvas>
       </div>
     </div>
-
     <GameResultPopup
         :visible="gameOver"
         :finalScore="finalScore"
         :gainedCoins="gainedCoins"
         @close="closePopup"
         @restart="restartGame"
+    />
+    <GameInstructionPopup
+        :visible="showIntro"
+        title="Как играть в «Лисёнок-машинист»"
+        :steps="[
+          { text: 'Управляй паровозиком с помощью клавиш WASD', icon: require('@/assets/keys/wasd.png') },
+          { text: 'Избегай ураганов, которые могут свести паровозик с рельсов', icon: null },
+          { text: 'Чтобы развеять ураганы, собери супер силу!', icon: null },
+          { text: 'Собирай монетки, чтобы получить как можно больше очков!', icon:  require('@/assets/coin.png') }
+        ]"
+        @start="startGameFromPopup"
     />
   </div>
 </template>
@@ -29,9 +38,8 @@ import {ref, onMounted, onUnmounted} from 'vue'
 import { usePacmanScoreStore } from '@/stores/pacmanScoreStore'
 import { useFoxStore } from '@/stores/foxStore'
 import { useRouter } from 'vue-router'
-
 import GameResultPopup from '@/components/GameResultPopup.vue'
-
+import GameInstructionPopup from '@/components/GameInstructionPopup.vue'
 import Boundary from '@/games/pacman/entities/Boundary.js'
 import Player from '@/games/pacman/entities/Player.js'
 import Ghost from '@/games/pacman/entities/Ghost.js'
@@ -47,13 +55,13 @@ const COIN_RATIO = 0.01;
 
 export default {
   name: "PacmanGame",
-  components: { GameResultPopup },
+  components: { GameResultPopup, GameInstructionPopup },
   setup() {
     const gameCanvas = ref(null)
     const scoreStore = usePacmanScoreStore()
     const foxStore = useFoxStore()
     const router = useRouter()
-
+    const showIntro = ref(true);
     const gameOver = ref(false)
     const finalScore = ref(0)
     const gainedCoins = ref(0)
@@ -91,6 +99,15 @@ export default {
     let lastKey = '';
     let mapWidth, mapHeight;
     let offsetX, offsetY;
+
+    onMounted(() => {
+      // initGame();
+    })
+
+    function startGameFromPopup() {
+      showIntro.value = false;
+      initGame();
+    }
 
     function animate() {
       animationId = requestAnimationFrame(animate);
@@ -683,10 +700,6 @@ export default {
       animate();
     }
 
-    onMounted(() => {
-      initGame();
-    })
-
     onUnmounted(() => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
@@ -720,10 +733,11 @@ export default {
       gameOver,
       finalScore,
       gainedCoins,
-
       exitGame,
       closePopup,
-      restartGame
+      restartGame,
+      showIntro,
+      startGameFromPopup
     }
   }
 }

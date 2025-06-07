@@ -1,6 +1,5 @@
 <template>
   <div class="match3-container">
-    <!-- Панель со счётом, кнопкой «Выйти» -->
     <div class="ui-overlay">
       <div class="score-display">
         <p>Очки: {{ scoreStore.score }}</p>
@@ -8,16 +7,22 @@
       </div>
       <button class="exit-button" @click="exitGame">Выйти в меню</button>
     </div>
-
-    <!-- Холст Pixi -->
     <div class="canvas-area" ref="container"></div>
-
-    <!-- Используем GameResultPopup -->
     <GameResultPopup
         :visible="gameOver"
         :finalScore="finalScore"
         :gainedCoins="gainedCoins"
         @close="closePopup"
+    />
+    <GameInstructionPopup
+        :visible="showIntro"
+        title="Как играть в «Лисёнок-диспетчер»"
+        :steps="[
+          { text: 'Перемещай вагончики с помощью курсора', icon: require('@/assets/keys/cursor.png') },
+          { text: 'Собери 3 и более вагончиков одного цвета в ряд, чтобы отправить их на сортировочную горку! ', icon: null },
+          { text: 'Чем больше вагончиков отправишь - тем больше получишь монеток!', icon:  require('@/assets/coin.png') }
+        ]"
+        @start="startGameFromPopup"
     />
   </div>
 </template>
@@ -30,21 +35,21 @@ import { useRouter } from 'vue-router'
 import { App } from '@/games/match3/system/App.js'
 import { Config } from '@/games/match3/game/Config.js'
 import GameResultPopup from '@/components/GameResultPopup.vue'
-import axios from "axios"; // <-- Вот компонент
+import GameInstructionPopup from '@/components/GameInstructionPopup.vue'
+import axios from "axios";
 
 export default {
   name: 'MatchThreeGame',
-  components: { GameResultPopup }, // Регистрируем
+  components: { GameResultPopup, GameInstructionPopup },
   setup() {
     const container = ref(null)
     const scoreStore = useMatchThreeScoreStore()
     const foxStore = useFoxStore()
     const router = useRouter()
-
-    // Состояние попапа
     const gameOver = ref(false)
     const finalScore = ref(0)
     const gainedCoins = ref(0)
+    const showIntro = ref(true);
 
     onMounted(async () => {
       if (!container.value) return;
@@ -60,7 +65,6 @@ export default {
 
       App.runCustom(Config, container.value)
 
-      // setTimeout - к примеру, чтобы дождаться инициализации
       setTimeout(() => {
         if (App.scene && App.scene.board) {
           App.scene.board.container.on('game-over', (payload) => {
@@ -81,7 +85,10 @@ export default {
       }
     })
 
-    // Завершить игру (вызвать endGame)
+    function startGameFromPopup() {
+      showIntro.value = false;
+    }
+
     async function exitGame() {
       if (gainedCoins.value > 0) {
         await foxStore.addCoins(gainedCoins.value);
@@ -94,7 +101,6 @@ export default {
       }
     }
 
-    // При «OK» на попапе – закрываем попап и уходим в меню
     function closePopup() {
       gameOver.value = false
       router.push({ name: 'MainMenu' })
@@ -108,7 +114,9 @@ export default {
       finalScore,
       gainedCoins,
       exitGame,
-      closePopup
+      closePopup,
+      startGameFromPopup,
+      showIntro
     }
   }
 }

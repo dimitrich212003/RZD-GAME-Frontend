@@ -116,13 +116,11 @@ export default class Game {
                 }
             }
 
-            this.scoreBoard.innerHTML = 'Score: ' + this.board.points;
+            this.scoreBoard.innerHTML = 'Очки: ' + this.board.points;
             this.draw();
 
             if(won === "winner"){
-                // Нужно сравнить board.points c порогом
                 if(this.board.points >= 20 + 20*this.level) {
-                    // success
                     this.evalResult(this.level+1, "winner", 20+20*this.level);
                 } else {
                     // not enough
@@ -142,11 +140,11 @@ export default class Game {
 
         // DOM
         if(resultType === "winner"){
-            this.levelResult.innerHTML = "Completed the level!";
-            this.next.innerHTML = "Continue";
+            this.levelResult.innerHTML = "Уровень пройден!";
+            this.next.innerHTML = "Продолжить";
         } else if(resultType === "game over"){
-            this.levelResult.innerHTML = "Game Over!";
-            this.next.innerHTML = "Play Again";
+            this.levelResult.innerHTML = "Проигрыш!";
+            this.next.innerHTML = "Попробовать снова";
         } else {
             // "not enough"
             this.levelResult.innerHTML = `Needed ${neededPoints} points to pass level!`;
@@ -173,7 +171,7 @@ export default class Game {
 
     round(){
         this.disableRestart(false);
-        this.levelBoard.innerHTML = 'Level '+this.level;
+        this.levelBoard.innerHTML = 'Уровень: '+this.level;
         this.draw();
 
         let width=1;

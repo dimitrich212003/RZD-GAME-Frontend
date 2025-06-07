@@ -23,7 +23,6 @@ export default {
 </script>
 
 <style>
-/* Подключение шрифта (пример) */
 @font-face {
   font-family: 'Kaph';
   src: url('@/assets/fonts/Kaph.woff2') format('woff2'),
@@ -47,28 +46,24 @@ export default {
   margin: 0 auto;
 }
 
-/* Шапка */
 .select-difficulty-header {
   display: block;
   padding: 2rem;
   text-align: left;
 }
 
-/* Логотип по умолчанию (Desktop) */
 .select-difficulty-header .logo {
   display: block;
-  width: 200px; /* Desktop: 200px */
+  width: 200px;
   height: auto;
 }
 
-/* Tablet: уменьшим до 120px (примерный брейкпоинт 768px) */
 @media (max-width: 768px) {
   .select-difficulty-header .logo {
     width: 160px;
   }
 }
 
-/* Mobile: ещё меньше – 80px (примерный брейкпоинт 480px) */
 @media (max-width: 480px) {
   .select-difficulty-header .logo {
     width: 140px;

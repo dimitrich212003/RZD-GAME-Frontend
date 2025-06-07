@@ -9,11 +9,7 @@
           <p>{{ gainedCoins }}</p>
           <img src="@/assets/coin.png" class="coin-icon" />
         </div>
-
-        <!-- Кнопка закрытия (OK) -->
         <button class="close-popup-btn" @click="$emit('close')">OK</button>
-
-        <!-- Новая кнопка «Перезапустить» -->
         <button class="restart-btn" @click="$emit('restart')">Начать заново</button>
       </div>
     </div>

@@ -6,14 +6,12 @@
     </div>
     <button class="exit-button" @click="exitGame">Выйти в меню</button>
   </div>
-
   <div id="pipe-mania">
     <canvas
         id="board"
         ref="boardCanvas"
         class="hidden"
     ></canvas>
-
     <div id="content">
       <div id="level">Уровень: {{ level }}</div>
       <div id="score">Очки: {{ localScore }}</div>
@@ -34,7 +32,7 @@
           :disabled="quickFinishDisabled"
           @click="onQuickFinish"
       >
-        Завершить уровень
+        Запустить поезд
       </button>
 
       <button
@@ -46,25 +44,20 @@
         Начать заного
       </button>
     </div>
-
-    <!-- Результат (старый div) -->
     <div id="result" class="hidden">
       <p id="level-result">{{ levelResultMessage }}</p>
       <button
           id="next"
           :disabled="nextDisabled"
           @click="onNext"
+          style="width: 250px; height: 50px;"
       >
         {{ nextButtonText }}
       </button>
     </div>
-
-    <!-- Таймер -->
     <div id="timerProgress" class="hidden">
       <div id="timerBar" ref="timerBar"></div>
     </div>
-
-    <!-- Картинки труб -->
     <div class="images">
       <img id="dirt" src="/pipeManiaSprites/dirt.png" />
       <img id="pipe0" src="/pipeManiaSprites/0.png" />
@@ -82,8 +75,6 @@
       <img id="pipe4_active" src="/pipeManiaSprites/4_active.png" />
       <img id="pipe5_active" src="/pipeManiaSprites/5_active.png" />
     </div>
-
-    <!-- Попап, где видим монеты (scoreStore.coins) и финальный счет -->
     <GameResultPopup
         :visible="gameOver"
         :finalScore="finalScore"
@@ -91,107 +82,102 @@
         @close="closePopup"
         @restart="restartGame"
     />
+    <GameInstructionPopup
+        :visible="showIntro"
+        title="Как играть в «Лисёнок-путеец»"
+        :steps="[
+          { text: 'Перемещай рельсы стрелками на клавиатуре', icon: require('@/assets/keys/arrows.png') },
+          { text: 'Установить рельс – пробел', icon: require('@/assets/keys/space.png') },
+          { text: 'Когда путь готов, нажми кнопку «Запустить поезд» справа от поля', icon: null },
+          { text: 'Успей довести паровозик до финиша до истечения зелёного таймера', icon: null },
+          { text: 'Чем больше уровней пройдешь - тем больше получишь монеток!', icon:  require('@/assets/coin.png') }
+
+        ]"
+        @start="startGameFromPopup"
+    />
   </div>
 </template>
-
 <script>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePipeManiaScoreStore } from '@/stores/pipeManiaStore.js'
 import { useFoxStore }   from '@/stores/foxStore.js'
-
 import Game from '@/games/pipemania/game.js'
 import GameResultPopup from '@/components/GameResultPopup.vue'
+import GameInstructionPopup from '@/components/GameInstructionPopup.vue'
 
 const COIN_RATIO = 0.01;
 
 export default {
   name: 'PipeManiaGame',
-  components: { GameResultPopup },
+  components: { GameResultPopup, GameInstructionPopup },
   setup() {
     const router = useRouter()
     const scoreStore = usePipeManiaScoreStore()
-    const foxStore   = useFoxStore()
-
+    const foxStore = useFoxStore()
     const boardCanvas = ref(null)
-    const timerBar    = ref(null)
-
-    // локальные reactive
-    const level              = ref(1)
-    const localScore         = ref(0)
+    const timerBar = ref(null)
+    const level = ref(1)
+    const localScore = ref(0)
     const levelResultMessage = ref('Completed the level!')
-    const nextButtonText     = ref('Continue')
-
-    const startDisabled       = ref(false)
+    const nextButtonText = ref('Continue')
+    const startDisabled = ref(false)
     const quickFinishDisabled = ref(true)
-    const restartDisabled     = ref(true)
-    const nextDisabled        = ref(true)
-
-    const gameOver    = ref(false)
-    const finalScore  = ref(0);
+    const restartDisabled = ref(true)
+    const nextDisabled = ref(true)
+    const gameOver = ref(false)
+    const finalScore = ref(0);
     const gainedCoins = ref(0);
-
     let pipeGame = null
+    const showIntro = ref(true);
 
     onMounted(() => {
       const canvas = boardCanvas.value
       canvas.width  = 650
       canvas.height = 500
       const ctx = canvas.getContext('2d')
-
-      // Создаём Game
       pipeGame = new Game(ctx, {
-        // Когда вода протекает ещё +10 к очкам:
         onAddScore(points) {
           scoreStore.addScore(points)
           localScore.value = scoreStore.score
         },
-        // Когда игра закончилась
         onGameEnd(resultType, newLevel, neededPoints) {
-          // (1) Записываем finalScore
           finalScore.value = scoreStore.score
 
           if (resultType === 'winner') {
-            // (2) +300 очков за прохождение уровня
             scoreStore.addScore(300)
             localScore.value = scoreStore.score
-
-            // (3) при желании ещё конвертируем часть в монеты
-            // scoreStore.addCoins(Math.floor(300 * 0.01)) // если хотим +3 coins
-
-            levelResultMessage.value = 'Level completed!'
-            nextButtonText.value     = 'Continue'
+            levelResultMessage.value = 'Уровень пройден!'
+            nextButtonText.value     = 'Продолжить'
             level.value = newLevel
           }
           else if (resultType === 'game over') {
-            scoreStore.resetCoins()
-            levelResultMessage.value = 'Game Over!'
-            nextButtonText.value     = 'Try Again'
+            scoreStore.resetCsoins()
+            levelResultMessage.value = 'Проигрыш!'
+            nextButtonText.value     = 'Попробовать снова'
             level.value = 1
           }
           else {
-            // not enough
             scoreStore.resetCoins()
-            levelResultMessage.value = `Needed ${neededPoints} points!`
-            nextButtonText.value = 'Try Again'
+            levelResultMessage.value = `Необходимо набрать ${neededPoints} очков!`
+            nextButtonText.value = 'Попробовать снова'
           }
         }
       })
     })
 
-    // ---------- Методы ----------
+    function startGameFromPopup() {
+      showIntro.value = false;
+    }
+
     function onStartClick() {
       boardCanvas.value.classList.remove('hidden')
       document.getElementById('timerProgress').classList.remove('hidden')
-
       startDisabled.value       = true
       quickFinishDisabled.value = false
       restartDisabled.value     = false
-
-      // Сбросим очки и монеты
       scoreStore.resetScore()
       localScore.value = 0
-
       pipeGame?.start()
     }
 
@@ -267,6 +253,8 @@ export default {
       finalScore,
       gainedCoins,
 
+      showIntro,
+      startGameFromPopup,
       onStartClick,
       onQuickFinish,
       onRestartLevel,
@@ -343,8 +331,11 @@ canvas {
   justify-self: center;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
+  gap: 20px;
   z-index: 10;
+  border-radius: 20px;
 }
 
 #timerProgress {

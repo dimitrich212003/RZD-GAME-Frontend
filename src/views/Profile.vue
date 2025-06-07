@@ -5,16 +5,9 @@
       <SwapButton />
     </header>
     <div class="content-wrapper">
-      <div
-          class="fox-avatar"
-          :style="backgroundStyle"
-      >
-        <img
-            :class="{ clicked: isClicked }"
-            @click="handleFoxClick"
-            :src="currentFoxImage"
-            alt="Лисёнок"
-        />
+      <div class="fox-avatar" :style="backgroundStyle">
+        <img :class="{ clicked: isClicked }" @click="handleFoxClick"
+            :src="currentFoxImage" alt="Лисёнок"/>
         <div
             v-for="coin in coins"
             :key="coin.id"
@@ -25,9 +18,7 @@
             }"
         ></div>
       </div>
-
       <div class="info-block">
-        <!-- Имя лисёнка -->
         <div class="info-line edit-name-wrapper">
           <span class="label">Имя лисёнка:</span>
           <div class="name-field">
@@ -40,7 +31,6 @@
                   @click="startEditingName"
               />
             </template>
-
             <template v-else>
               <form class="edit-name">
                 <div>
@@ -64,14 +54,10 @@
             </template>
           </div>
         </div>
-
-        <!-- Количество монеток -->
         <div class="info-line coins-wrapper">
           <p class="value coin-value">{{ foxStore.totalCoins }}</p>
           <p class="label coin-label">Монетки</p>
         </div>
-
-        <!-- Уровень игры (Малыш/Взрослый) -->
         <div class="info-line">
           <span class="label">Уровень игры:</span>
           <span class="value">{{ difficultyLabel }}</span>
@@ -99,40 +85,32 @@ export default {
     Logo
   },
   setup() {
-    // Хранилища
     const foxStore = useFoxStore();
     const difficultyStore = useDifficultyStore();
-
-    // Для анимации клика по лисёнку
     const isClicked = ref(false);
     const coins = ref([]);
-
-    // Редактирование имени
     const isEditingName = ref(false);
     const tempName = ref("");
     const showError = ref(false);
-
-
     const startEditingName = () => {
       isEditingName.value = true;
-      tempName.value = foxStore.foxName; // подставляем текущее имя
+      tempName.value = foxStore.foxName;
     };
-
     const saveName = async () => {
       if (!foxStore.foxId) {
         console.error('Fox ID не сохранено');
         return;
       }
-
       try {
         const currentLevel = difficultyStore.difficultyLevel;
-        const response = await axios.put(`http://localhost:8585/api/fox/updateName/${foxStore.foxId}`, tempName.value.trim(),
+        const response = await axios
+            .put(`http://localhost:8585/api/fox/updateName/${foxStore.foxId}`,
+                tempName.value.trim(),
             {
               headers: {
                 'Content-Type': 'text/plain'
               }
             });
-
         foxStore.setFoxName(response.data.name);
         difficultyStore.setDifficulty(currentLevel);
         isEditingName.value = false;
@@ -150,7 +128,6 @@ export default {
       showError.value = !isValid.value;
     };
 
-    // Логика клика по лисёнку
     const handleFoxClick = () => {
       isClicked.value = true;
       setTimeout(() => {
@@ -178,12 +155,10 @@ export default {
       }, 1000);
     };
 
-    // Определяем уровень игры "Малыш"/"Взрослый"
     const difficultyLabel = computed(() => {
       return difficultyStore.difficultyLevel === 'easy' ? 'Малыш' : 'Взрослый';
     });
 
-    // Определяем текущую стадию лисёнка
     const currentStage = computed(() => {
       const total = foxStore.totalCoins;
       if (total >= 1000) return 'Профи';
@@ -191,7 +166,6 @@ export default {
       if (total >= 100) return 'Юниор';
       return 'Малыш';
     });
-
 
     const currentFoxImage = computed(() => {
       if (currentStage.value === 'Юниор') return require('@/assets/2level.png');
@@ -202,28 +176,25 @@ export default {
 
     const backgroundStyle = computed(() => {
       let gradientColor = "transparent";
-      let fillPercentage = 0; // Процент заполнения круга
-
+      let fillPercentage = 0;
       if (foxStore.totalCoins >= 10000) {
-        // Радужный градиент
         return {
           backgroundImage: "linear-gradient(135deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #8B00FF)",
           transition: "background 0.5s ease-in-out",
         };
       } else if (foxStore.totalCoins >= 1000) {
-        gradientColor = "#D50000"; // Красный
+        gradientColor = "#D50000";
         fillPercentage = ((foxStore.totalCoins - 1000) / (10000 - 1000)) * 100;
       } else if (foxStore.totalCoins >= 500) {
-        gradientColor = "#003399"; // Синий
+        gradientColor = "#003399";
         fillPercentage = ((foxStore.totalCoins - 500) / (1000 - 500)) * 100;
       } else if (foxStore.totalCoins >= 100) {
-        gradientColor = "#EE7F1A"; // Оранжевый
+        gradientColor = "#EE7F1A";
         fillPercentage = ((foxStore.totalCoins - 100) / (500 - 100)) * 100;
       } else if (foxStore.totalCoins > 0) {
-        gradientColor = "#009946"; // Зеленый
+        gradientColor = "#009946";
         fillPercentage = (foxStore.totalCoins / 100) * 100;
       }
-
       return {
         background: `linear-gradient(to top, ${gradientColor} ${fillPercentage}%, transparent ${fillPercentage}%)`,
         transition: "background 0.5s ease-in-out",
@@ -238,7 +209,6 @@ export default {
       if (!difficultyStore.difficultyLevel) {
         difficultyStore.setDifficulty('easy');
       }
-
       try {
         const response = await axios.get(`http://localhost:8585/api/fox/${foxStore.foxId}`);
         foxStore.setFoxName(response.data.name);
@@ -281,7 +251,6 @@ export default {
   align-items: center;
 }
 
-/* Общий контейнер */
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -292,7 +261,6 @@ export default {
   margin: 0 auto;
 }
 
-/* Обёртка для лисёнка и инфоблока */
 .content-wrapper {
   display: flex;
   align-items: center;
@@ -303,7 +271,6 @@ export default {
   padding: 0 2rem;
 }
 
-/* Лисёнок */
 .fox-avatar {
   flex-shrink: 0;
   width: clamp(330px, 40vw, 500px);
@@ -327,7 +294,6 @@ export default {
   transform: translate(-50%, -50%) scale(0.9);
 }
 
-/* Монетки */
 .coin {
   --x: 0px;
   --y: 0px;
@@ -352,7 +318,6 @@ export default {
   }
 }
 
-/* Информационный блок */
 .info-block {
   display: flex;
   flex-direction: column;
@@ -398,27 +363,23 @@ export default {
   text-align: center;
 }
 
-/* Единая строка (метка+значение) */
 .info-line {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-/* Метка */
 .label {
   font-weight: 600;
   color: #026288;
-  min-width: 100px; /* Можно подстраивать */
+  min-width: 100px;
 }
 
-/* Значение */
 .value {
   font-weight: bold;
-  color: #FF9800; /* Оранжевый */
+  color: #FF9800;
 }
 
-/* Имя + иконка редактирования */
 .name-field {
   display: flex;
   align-items: center;
@@ -449,7 +410,6 @@ export default {
 .coin-label {
 }
 
-/* Адаптация */
 @media (max-width: 992px) {
   .content-wrapper {
     flex-direction: column;
