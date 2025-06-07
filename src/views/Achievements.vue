@@ -119,7 +119,6 @@ export default {
   align-items: center;
 }
 
-/* Картинка */
 .achievement-card img {
   width: 100px;
   height: 100px;

@@ -100,10 +100,6 @@ export default {
     let mapWidth, mapHeight;
     let offsetX, offsetY;
 
-    onMounted(() => {
-      // initGame();
-    })
-
     function startGameFromPopup() {
       showIntro.value = false;
       initGame();
@@ -189,7 +185,6 @@ export default {
         }
       }
 
-      //обнаружение столкновение игрока и призрака
       for (let i = ghosts.length - 1; i >= 0; i--) {
         const ghost = ghosts[i];
         if (Math.hypot(
@@ -211,17 +206,14 @@ export default {
         exitGame();
       }
 
-      // Логика касания суперсилы
       for (let i = powerUps.length - 1; i >= 0; i--) {
         const powerUp = powerUps[i];
         powerUp.draw(context);
 
-        // если игрок съел суперсилу
         if (Math.hypot(powerUp.position.x - player.position.x, powerUp.position.y - player.position.y)
             < powerUp.radius + player.radius) {
           powerUps.splice(i, 1);
 
-          // делаем так, что призраки пугаются
           ghosts.forEach(ghost => {
             ghost.scared = true;
 
@@ -232,12 +224,9 @@ export default {
         }
       }
 
-      // Логика касания гранул
       for (let i = pellets.length - 1; i >= 0; i--) {
         const pellet = pellets[i];
         pellet.draw(context);
-
-        // если игрок съел гранулу
         if (Math.hypot(pellet.position.x - player.position.x, pellet.position.y - player.position.y)
             < pellet.radius + player.radius) {
           pellets.splice(i, 1);
@@ -748,10 +737,9 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100vh; /* или 100% */
+  height: 100vh;
 }
 
-/* Панель со счётом и кнопкой выхода */
 .ui-overlay {
   display: flex;
   gap: 1rem;
@@ -762,12 +750,11 @@ export default {
   justify-content: space-between;
 }
 
-/* Здесь размещаем поле */
 .game-field-wrapper {
   flex: 1;
   display: flex;
-  justify-content: center; /* по горизонтали */
-  align-items: center;     /* по вертикали */
+  justify-content: center;
+  align-items: center;
 }
 
 .game-field {

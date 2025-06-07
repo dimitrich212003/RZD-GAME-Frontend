@@ -4,15 +4,13 @@ import Pipe from './pipe.js';
 export default class Game {
     constructor(ctx, options = {}) {
         this.ctx = ctx;
-        this.options = options; // { onAddScore, onGameEnd }
+        this.options = options;
         this.images = this._loadImages();
 
         this.level = 1;
         this.timerInterval = null;
         this.flowInterval = null;
         this.timeout = null;
-
-        // Находим DOM-элементы
         this.levelBoard   = document.getElementById("level");
         this.scoreBoard   = document.getElementById("score");
         this.result       = document.getElementById("result");
@@ -22,7 +20,6 @@ export default class Game {
         this.restartBtn   = document.getElementById("restart");
         this.quickFinishBtn = document.getElementById("quick-finish");
         this.timerBarElem = document.getElementById("timerBar");
-
         this.setupGame();
     }
 
@@ -31,15 +28,12 @@ export default class Game {
         const destPos   = this._randomDestinationPos();
 
         this.images[6].src = '/pipeManiaSprites/0_active.png';
-
         this.board = new Board(this.images, sourcePos, destPos);
         this.pipeQueue = [ new Pipe(), new Pipe(), new Pipe() ];
-
         this.board.placePipe(Pipe.source(), sourcePos);
         this.board.placePipe(Pipe.destination(), destPos);
         this.board.setCurrentPos();
-        this.board.points = 0; // очки внутри board
-
+        this.board.points = 0;
         this.board.drawGrid(this.ctx);
         this.draw();
     }
@@ -67,9 +61,7 @@ export default class Game {
 
     bindKeyHandlers(){
         document.addEventListener('keydown', e => {
-            // стрелки -> движение селектора
             this.board.updateSelectedPos(e.keyCode);
-            // если нажали пробел, ставим трубу – больше очков здесь не даём
             if(e.keyCode === 32 && !this.board.checkPos()){
                 this.board.placePipe(this.pipeQueue.shift());
                 this.pipeQueue.push(new Pipe());
@@ -94,8 +86,6 @@ export default class Game {
         clearInterval(this.flowInterval);
         clearTimeout(this.timeout);
         this.disableRestart(true);
-
-        // Быстрая проверка (300мс)
         this.checkWin(300);
     }
 
@@ -103,14 +93,10 @@ export default class Game {
         this.images[6].src = '/pipeManiaSprites/0.png';
 
 
-        // Каждые interval мс двигаем воду
         this.flowInterval = setInterval(() => {
             const won = this.board.checkWin(this.flowInterval);
-            // Если вода протекла через одну трубу успешно => board.points += 10
-            // => вызываем onAddScore(10)
             if (this.board.lastFlowSuccess) {
-                // т.е. board.checkConnection(...) прошло
-                this.board.lastFlowSuccess = false; // сброс флага
+                this.board.lastFlowSuccess = false;
                 if (this.options.onAddScore) {
                     this.options.onAddScore(10);
                 }
@@ -123,7 +109,6 @@ export default class Game {
                 if(this.board.points >= 20 + 20*this.level) {
                     this.evalResult(this.level+1, "winner", 20+20*this.level);
                 } else {
-                    // not enough
                     const needed = 20+20*this.level;
                     this.evalResult(this.level, "not enough", needed);
                 }
@@ -138,7 +123,6 @@ export default class Game {
         this.disableRestart(true);
         this.level = newLevel;
 
-        // DOM
         if(resultType === "winner"){
             this.levelResult.innerHTML = "Уровень пройден!";
             this.next.innerHTML = "Продолжить";
@@ -146,13 +130,11 @@ export default class Game {
             this.levelResult.innerHTML = "Проигрыш!";
             this.next.innerHTML = "Попробовать снова";
         } else {
-            // "not enough"
             this.levelResult.innerHTML = `Needed ${neededPoints} points to pass level!`;
             this.next.innerHTML = "Try Again!";
         }
         this.result.classList.remove("hidden");
 
-        // колбэк onGameEnd
         if(this.options.onGameEnd){
             this.options.onGameEnd(resultType, newLevel, neededPoints);
         }
@@ -163,7 +145,6 @@ export default class Game {
         clearInterval(this.flowInterval);
         clearTimeout(this.timeout);
         this.disableRestart(true);
-
         this.ctx.clearRect(0,0,700,500);
         this.setupGame();
         this.round();

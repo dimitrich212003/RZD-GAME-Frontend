@@ -90,7 +90,6 @@ export default {
 
 }
 
-/* Обёртка для карточек */
 .cards-wrapper {
   display: flex;
   width: 100%;
@@ -99,7 +98,6 @@ export default {
   align-items: center;
 }
 
-/* Карточка */
 .difficulty-card {
   cursor: pointer;
   width: clamp(300px, 30vw, 500px);
@@ -114,7 +112,6 @@ export default {
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-/* Контейнер для лисёнка, чтобы "выступал" за карточку */
 .fox-image {
   position: absolute;
   top: -10%;
@@ -125,19 +122,16 @@ export default {
   justify-content: center;
 }
 
-/* Настройка изображения */
 .fox-image img {
   height: auto;
   transform: scale(1);
   transition: transform 0.2s ease-in-out;
 }
 
-/* Лёгкий лисёнок немного меньше, если хотите */
 .easy_img {
   width: 95%;
 }
 
-/* Взрослый лисёнок */
 .hard_img {
   width: 100%;
 }
@@ -149,7 +143,6 @@ export default {
   font-weight: bold;
 }
 
-/* Фоновые цвета для карточек */
 .difficulty-card.easy {
   background-color: #EE7F1A;
 }
@@ -158,23 +151,19 @@ export default {
   background-color: #00A0E3;
 }
 
-/* Анимация при ховере */
 .difficulty-card:hover {
   transform: scale(1.05);
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Анимация при клике */
 .difficulty-card:active {
   transform: scale(0.95);
 }
 
-/* Увеличиваем лисенка при наведении */
 .difficulty-card:hover .fox-image img {
   transform: scale(1.1);
 }
 
-/* ----- Адаптация под планшеты ----- */
 @media (max-width: 768px) {
   .cards-wrapper {
     flex-direction: column;
@@ -186,7 +175,6 @@ export default {
   }
 }
 
-/* ----- Адаптация под мобильные ----- */
 @media (max-width: 480px) {
   .difficulty-card {
     width: 100%;

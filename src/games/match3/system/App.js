@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { Loader as PixiLoader } from '@pixi/loaders';
 import { gsap } from 'gsap';
 import { PixiPlugin } from 'gsap/PixiPlugin';
-import { Loader } from './Loader'; // ваш Loader.js
+import { Loader } from './Loader';
 
 class Application {
     runCustom(config, domElement) {
@@ -10,22 +10,14 @@ class Application {
         PixiPlugin.registerPIXI(PIXI);
 
         this.config = config;
-
-        // Создаем Pixi-приложение
         this.app = new PIXI.Application({
             resizeTo: window,
             backgroundAlpha: 0,
         });
 
-        // Вставляем canvas
         domElement.appendChild(this.app.view);
-
-        // Создаем экземпляр PixiLoader
         const pixiLoader = new PixiLoader();
-
-        // Передаем pixiLoader в ваш класс Loader
         this.loader = new Loader(pixiLoader, this.config);
-
         this.loader.preload().then(() => this.start());
     }
 
@@ -38,7 +30,6 @@ class Application {
         return resource.texture;
     }
 
-    // Создаём PIXI.Sprite по ключу
     sprite(key) {
         return new PIXI.Sprite(this.res(key));
     }

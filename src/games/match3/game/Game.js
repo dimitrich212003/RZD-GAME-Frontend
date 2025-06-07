@@ -1,4 +1,3 @@
-// src/games/match3/game/Game.js
 import * as PIXI from "pixi.js";
 import { App } from "../system/App";
 import { Board } from "./Board";
@@ -10,40 +9,27 @@ export class Game {
         this.scoreStore = App.config.scoreStore;
         this.foxStore = App.config.foxStore;
 
-        // Reset score
         if (this.scoreStore) {
             this.scoreStore.resetScore();
         }
 
-        this.initPhase = true; // флаг, что мы в стартовой чистке
+        this.initPhase = true;
         this.resolveBoardSize();
 
         this.board = new Board();
         this.container.addChild(this.board.container);
-
         this.board.container.on('tile-touch-start', this.onTileClick.bind(this));
         this.combinationManager = new CombinationManager(this.board);
-
-        // чистим стартовые совпадения
         this.removeStartMatches();
-
-        // в конце конструктора — отключаем initPhase
         this.initPhase = false;
     }
 
     endGame() {
-        // 1) Получаем финальный счёт
         const finalScore = this.scoreStore.score;
-
-        // 2) Вычисляем монетки: round(score * 0.01)
         const gainedCoins = Math.round(finalScore * 0.01);
-
-        // 3) Зачисляем монетки в FoxStore
         if (this.foxStore) {
             this.foxStore.addCoins(gainedCoins);
         }
-
-        // 4) Сообщаем Vue-компоненту (через событие) сколько монеток
         this.board.container.emit("game-over", {
             finalScore,
             gainedCoins
@@ -56,14 +42,11 @@ export class Game {
             totalTiles += match.length;
             match.forEach(tile => tile.remove());
         });
-
-        // Начисляем очки, только если не initPhase
         if (!this.initPhase && this.scoreStore) {
             this.scoreStore.addScore(totalTiles * 10);
         }
     }
 
-    // Пример: если ширина экрана < 768 => 6x10, иначе 8x8
     resolveBoardSize() {
         if (window.innerWidth < 505) {
             App.config.board.rows = 9;
@@ -77,14 +60,6 @@ export class Game {
             App.config.board.cols = 8;
         }
     }
-
-    // Если вам нужно было background:
-    // createBackground() {
-    //   this.bg = App.sprite("bg");
-    //   this.bg.width = window.innerWidth;
-    //   this.bg.height = window.innerHeight;
-    //   this.container.addChild(this.bg);
-    // }
 
     removeStartMatches() {
         let matches = this.combinationManager.getMatches();
@@ -105,15 +80,12 @@ export class Game {
         if (this.disabled) return;
         if (this.selectedTile) {
             if (!this.selectedTile.isNeighbour(tile)) {
-                // не соседняя плитка
                 this.clearSelection(tile);
                 this.selectTile(tile);
             } else {
-                // swap
                 this.swap(this.selectedTile, tile);
             }
         } else {
-            // первая плитка
             this.selectTile(tile);
         }
     }
@@ -143,8 +115,6 @@ export class Game {
 
     processMatches(matches) {
         this.removeMatches(matches);
-
-        // после удаления — заставляем плитки падать
         this.processFallDown()
             .then(() => this.addTiles())
             .then(() => this.onFallDownOver());
@@ -164,7 +134,6 @@ export class Game {
             const fields = this.board.fields.filter(field => field.tile === null);
             let total = fields.length;
             let completed = 0;
-
             fields.forEach(field => {
                 const tile = this.board.createTile(field);
                 tile.sprite.y = -500;

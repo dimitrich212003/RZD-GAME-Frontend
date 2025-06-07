@@ -30,8 +30,6 @@ export default class Pipe {
             }
         });
     }
-
-    // Для определения противоположного направления (up->down и т.д.)
     static complement(dir) {
         switch (dir) {
             case 'up':    return 'down';
@@ -42,25 +40,19 @@ export default class Pipe {
         }
     }
 
-    // Стартовая труба
     static source() {
-        // img:6 (по аналогии с оригиналом)
         return new Pipe({ 'right': 'out', img: 6 });
     }
 
-    // Конечная труба
     static destination() {
-        // img:1 (по аналогии с оригиналом)
         return new Pipe({ 'up': 'in', img: 1 });
     }
 
-    // Выбор случайной конфигурации
     static random() {
         return Pipe.SECTIONS[Math.floor(Math.random() * Pipe.SECTIONS.length)];
     }
 }
 
-// Из оригинального кода:
 Pipe.SECTIONS = [
     { 'up': '', 'down': '', 'img': 1 },
     { 'left': '', 'right': '', 'img': 0 },
@@ -72,7 +64,6 @@ Pipe.SECTIONS = [
     { 'down': '', 'right': '', 'img': 5 }
 ];
 
-// Движение для out-flow
 Pipe.MOVES = {
     'up':    [ 0, -1],
     'down':  [ 0,  1],

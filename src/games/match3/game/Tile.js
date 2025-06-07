@@ -5,12 +5,10 @@ export class Tile {
     constructor(color) {
         this.color = color;
         this.sprite = App.sprite(this.color);
-        // anchor(0.5,0.5), чтобы (x,y) = центр тайла
         this.sprite.anchor.set(0.5);
     }
 
     setPosition(pos) {
-        // Ставим в центр (pos.x, pos.y)
         this.sprite.x = pos.x;
         this.sprite.y = pos.y;
     }
@@ -31,7 +29,6 @@ export class Tile {
     }
 
     isNeighbour(otherTile) {
-        // Соседние ячейки: row±1,col±1
         return (
             Math.abs(this.field.row - otherTile.field.row) +
             Math.abs(this.field.col - otherTile.field.col)
@@ -50,7 +47,6 @@ export class Tile {
     }
 
     fallDownTo(pos, delay) {
-        // Немного «прыгает»
         return this.moveTo(pos, 0.5, delay, "bounce.out");
     }
 }

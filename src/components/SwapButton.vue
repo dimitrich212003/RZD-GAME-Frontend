@@ -25,7 +25,6 @@ export default {
 </script>
 
 <style scoped>
-/* Основные стили кнопки */
 .change-difficulty {
   background-color: transparent;
   color: #012838;

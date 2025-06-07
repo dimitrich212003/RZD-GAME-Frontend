@@ -4,7 +4,7 @@ export default class Ghost {
     constructor({ position, velocity, sprites }) {
         this.position = position
         this.velocity = velocity
-        this.sprites  = sprites             // { active, inactive }
+        this.sprites  = sprites
         this.radius   = 15
         this.prevCollisions = []
         this.speed    = 1.5

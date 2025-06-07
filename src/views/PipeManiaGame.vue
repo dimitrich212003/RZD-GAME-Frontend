@@ -199,15 +199,12 @@ export default {
     }
 
     function exitGame() {
-      // Останавливаем
       pipeGame?.end()
 
-      // Переносим локальные монеты -> foxStore
       if (localScore.value > 0) {
         foxStore.addCoins(localScore.value * COIN_RATIO)
       }
 
-      // Показываем попап
       gameOver.value   = true
       finalScore.value = localScore.value
       gainedCoins.value = finalScore.value * COIN_RATIO;

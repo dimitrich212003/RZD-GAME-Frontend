@@ -172,68 +172,47 @@ export default {
       pauseSound = document.querySelector('#pause-sound')
       lostSound = document.querySelector('#lost-sound')
       winSound = document.querySelector('#win-sound')
-
       wolf = document.querySelector('#wolf')
-
-      // Гнёзда (куда «выкатывается» яйцо)
       nestLU = document.querySelector('#chicken-left-up')
       nestLD = document.querySelector('#chicken-left-down')
       nestRU = document.querySelector('#chicken-right-up')
       nestRD = document.querySelector('#chicken-right-down')
-
-      // Показать стартовое (лвл=1, score=0, lives=5)
       showScore();
-
-      // Клик по кнопке "Старт"/"Пауза"
       pauseElement.addEventListener('click', pauseHandler)
-
-      // События кликов на 4 зоны (мобильная версия)
       CRU.addEventListener('click', () => setWolfPos('ru'))
       CLU.addEventListener('click', () => setWolfPos('lu'))
       CRD.addEventListener('click', () => setWolfPos('rd'))
       CLD.addEventListener('click', () => setWolfPos('ld'))
-
-      // Управление волком с клавиатуры (стрелки)
       document.addEventListener('keydown', keyDown)
 
       function pauseHandler() {
-        // Если игра идёт -> ставим на паузу
         if (gameProcess && !pauseFlag) {
           pauseFlag = true
           clearInterval(game)
           gameProcess = false
-
-          // Меняем текст на "Продолжить"
           pauseElement.innerHTML = 'Продолжить'
           pauseElement.classList.add('active')
           lock.classList.add('active')
-
           removeAllEggs()
           clearAllTimeouts()
           pauseSound.play()
           wolf.className = 'rc'
-
           setTimeout(() => {
             pauseFlag = false
           }, 300)
 
         } else if (!gameProcess && !pauseFlag) {
-          // Если игра НЕ идёт -> запускаем
           pauseFlag = true
-
           rollingSpeed = rollingSpeed || 2000
           game = setInterval(nextRandomEgg, rollingSpeed)
           gameProcess = true
-
           pauseElement.innerHTML = 'Пауза'
           pauseElement.classList.remove('active')
           lock.classList.remove('active')
-
           pauseSound.play()
           showScore()
           wolf.className = 'lc'
           anounce('Поехали !', 1500)
-
           setTimeout(() => {
             pauseFlag = false
           }, 300)
@@ -250,8 +229,6 @@ export default {
       function keyDown(e) {
         if (!gameProcess) return
         e.stopPropagation()
-
-        // вверх (38)
         if (e.keyCode === 38) {
           wolfLevel = 'up'
           if (wolfSide === 'right') {
@@ -263,7 +240,6 @@ export default {
           }
         }
 
-        // вниз (40)
         if (e.keyCode === 40) {
           wolfLevel = 'down'
           if (wolfSide === 'right') {
@@ -275,7 +251,6 @@ export default {
           }
         }
 
-        // вправо (39)
         if (e.keyCode === 39) {
           if (wolfSide !== 'right') {
             wolf.className = 'rc'
@@ -294,7 +269,6 @@ export default {
           }
         }
 
-        // влево (37)
         if (e.keyCode === 37) {
           if (wolfSide !== 'left') {
             wolf.className = 'lc'
@@ -314,7 +288,6 @@ export default {
         }
       }
 
-      // Очищаем все setTimeout
       clearAllTimeouts = () => {
         const highestTimeoutId = setTimeout(';')
         for (let i = 0; i < highestTimeoutId; i++) {
@@ -322,7 +295,6 @@ export default {
         }
       }
 
-      // Удаляем все яйца из DOM
       removeAllEggs = () => {
         const all = document.querySelectorAll('.egg')
         all.forEach(egg => {
@@ -330,7 +302,6 @@ export default {
         })
       }
 
-      // Выбрать случайное гнездо и запустить яичко
       function nextRandomEgg() {
         nextEgg = getRandomInt(1, 4)
         if (nextEgg === 1) startEgg(nestRD)
@@ -339,12 +310,10 @@ export default {
         if (nextEgg === 4) startEgg(nestLU)
       }
 
-      // Создаём div.egg
       function createEgg(nest) {
         const egg = document.createElement('div')
         egg.className = 'egg'
 
-        // белое или коричневое
         if (getRandomInt(1, 2) === 1) {
           egg.classList.add('egg-white')
         } else {
@@ -448,7 +417,6 @@ export default {
           gameOver()
         }
 
-        // Повышаем уровень каждые 10 очков
         if (score === 10) { level = 2; doSunRotateOnce(); scoreStore.addScore(300); }
         if (score === 20) { level = 3; doSunRotateOnce(); scoreStore.addScore(300); }
         if (score === 30) { level = 4; doSunRotateOnce(); scoreStore.addScore(300); }
@@ -914,7 +882,7 @@ export default {
 .chicken-right-up__wrap { position: relative; }
 #chicken-right-down { top: 52%; right: 0; }
 .chicken-right-down__wrap { position: relative; }
-/* Помосты */
+
 .pomost-left-up,
 .pomost-right-up,
 .pomost-left-down,
@@ -947,7 +915,7 @@ export default {
   top: 1rem;
   background-image: url("@/assets/WolfAndEggsSprites/pomost_rd.png");
 }
-/* Картинки куриц */
+
 .chicken-left,
 .chicken-right {
   position: relative;

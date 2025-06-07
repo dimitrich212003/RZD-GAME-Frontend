@@ -22,36 +22,25 @@ a {
 
 
 :root {
-    /* Цвета (пример) */
     --color-primary: #336699;
     --color-secondary: #FF9800;
     --color-accent: #FF5722;
     --color-background: #f3f3f3;
     --color-text: #333333;
     --color-white: #ffffff;
-
-    /* Размеры шрифтов (примерная шкала) */
     --font-size-base: 16px;
     --font-size-sm: 14px;
     --font-size-md: 18px;
     --font-size-lg: 24px;
     --font-size-xl: 32px;
-
-    /* Отступы (пример) */
-    --spacing-sm: 0.5rem; /* 8px */
-    --spacing-md: 1rem;   /* 16px */
-    --spacing-lg: 2rem;   /* 32px */
-
-    /* Прочее (пример) */
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
     --border-radius-base: 8px;
     --transition-base: 0.3s ease-in-out;
 }
 
-/* =======================
-   3. Базовые стили HTML-тегов
-   ======================= */
 
-/* Устанавливаем базовый шрифт и фон на body */
 html,
 body {
     width: 100%;
@@ -65,7 +54,6 @@ body {
     line-height: 1.4;
 }
 
-/* Заголовки H1–H6 с примерными размерами */
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     margin-bottom: var(--spacing-sm);
@@ -100,21 +88,17 @@ h6 {
 p {
 }
 
-/* Ссылки при наведении */
 a:hover {
     opacity: 0.8;
 }
 
-/* Картинки по умолчанию – адаптивные */
 img {
     display: block;
     max-width: 100%;
     height: auto;
 }
 
-/* =======================
-   4. Кнопки
-   ======================= */
+
 button {
     display: inline-block;
     font-family: 'Kaph', sans-serif;
@@ -136,9 +120,7 @@ button:disabled {
     cursor: not-allowed;
 }
 
-/* =======================
-   5. Формы (input, select, textarea)
-   ======================= */
+
 input,
 select,
 textarea {
@@ -160,28 +142,20 @@ textarea:focus {
     border-color: var(--color-primary);
 }
 
-/* =======================
-   6. Утилитарные классы (необязательно, пример)
-   ======================= */
-
-/* Класс для скрытия элемента, но сохранения места под него */
 .hidden {
     display: none !important;
 }
 
-/* Класс для полностью невидимого элемента, но оставляющего место (visibility:hidden) */
 .invisible {
     visibility: hidden !important;
 }
 
-/* Класс для выравнивания по центру (контейнер) */
 .center {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Класс для убирания текста с экрана, но сохранения для скринридеров */
 .visually-hidden {
     position: absolute !important;
     width: 1px;

@@ -78,21 +78,16 @@ export default {
 
     const isClicked = ref(false);
 
-    // Массив монеток
     const coins = ref([]);
 
-    // Клик по лисёнку: scale + spawn монеток
     const handleFoxClick = () => {
       isClicked.value = true;
       setTimeout(() => {
         isClicked.value = false;
       }, 150);
-
-      // 2. Запускаем монетки
       spawnCoins();
     };
 
-    // Создаём 5 монеток с рандомным направлением
     const spawnCoins = () => {
       const newCoins = [];
       for (let i = 0; i < 5; i++) {
@@ -105,14 +100,11 @@ export default {
         });
       }
       coins.value.push(...newCoins);
-
-      // Удаляем эти монетки из массива через 1с
       setTimeout(() => {
         coins.value.splice(0, newCoins.length);
       }, 1000);
     };
 
-    // Сабмит формы
     const submitName = async () => {
       if (!isValid.value) {
         showError.value = true;
@@ -132,11 +124,10 @@ export default {
           coins: response.data.coins,
           id: response.data.id
         });
-        localStorage.setItem('foxId', response.data.id); // Сохраняем ID
+        localStorage.setItem('foxId', response.data.id);
 
 
         console.log("Создали лисенка: " + foxStore.foxName);
-        // 4. Переходим на главный экран
         router.push({ name: 'MainMenu' });
 
       } catch (error) {

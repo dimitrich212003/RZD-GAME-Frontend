@@ -71,7 +71,6 @@ export default {
 </script>
 
 <style scoped>
-/* Основной контейнер навигации */
 .bottom-nav {
   position: absolute;
   bottom: 10px;
@@ -87,7 +86,6 @@ export default {
   border-radius: 40px;
 }
 
-/* Элементы навбара */
 .nav-item {
   font-size: 1.5rem;
   color: #fff;
@@ -97,12 +95,10 @@ export default {
   position: relative;
 }
 
-/* Анимация при активации */
 .nav-item.active {
   opacity: 1;
 }
 
-/* Плавное появление active.svg */
 .nav-item.active::after {
   content: "";
   position: absolute;
@@ -118,20 +114,17 @@ export default {
   animation: fade-in 0.3s ease-in-out forwards;
 }
 
-/* Анимация смены иконок */
 .nav_icon {
   width: 30px;
   height: 30px;
   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 
-/* Плавное увеличение иконки при активации */
 .nav-item.active .nav_icon {
   transform: scale(1.2);
   opacity: 1;
 }
 
-/* Анимация появления active.svg */
 @keyframes fade-in {
   from {
     opacity: 0;

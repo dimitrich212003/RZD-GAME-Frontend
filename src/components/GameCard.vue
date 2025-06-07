@@ -47,7 +47,6 @@ export default {
 </script>
 
 <style scoped>
-/* Основные стили карточки */
 .game-card {
   display: flex;
   flex-direction: column;
@@ -59,13 +58,11 @@ export default {
   transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
-/* Анимация при наведении: тень + увеличение */
 .game-card:hover {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   transform: translateY(-5px);
 }
 
-/* Изображение лисёнка */
 .game-image {
   position: absolute;
   top: -10%;
@@ -73,12 +70,10 @@ export default {
   transition: transform 0.3s ease-in-out;
 }
 
-/* Изображение подлетает при наведении */
 .game-card:hover .game-image {
   transform: translateY(-10px);
 }
 
-/* Контейнер информации */
 .card-info_wrapper {
   width: 65%;
   height: 100%;
@@ -88,21 +83,18 @@ export default {
   margin: 20px 0;
 }
 
-/* Заголовок игры */
 .game-title {
   font-size: 1.7rem;
   color: #fff;
   margin-bottom: 0.5rem;
 }
 
-/* Описание */
 .game-description {
   font-size: 0.8rem;
   color: #fff;
   margin-bottom: 1rem;
 }
 
-/* Кнопка "Играть" */
 .play-button {
   padding: 0.5rem 1rem;
   background-color: #d50000;
@@ -115,13 +107,11 @@ export default {
   height: 50px;
 }
 
-/* Кнопка при наведении немного увеличивается */
 .play-button:hover {
   background-color: #b71c1c;
   transform: scale(1.05);
 }
 
-/* Адаптация под планшеты */
 @media (max-width: 992px) {
   .game-image {
   }
@@ -129,7 +119,6 @@ export default {
   }
 }
 
-/* Адаптация под мобильные устройства */
 @media (max-width: 615px) {
   .game-image {
     width: 200px;
