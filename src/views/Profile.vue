@@ -1,7 +1,7 @@
 <template>
   <div class="profile-container">
     <header class="top-bar">
-      <Logo />
+      <RzdLogo />
       <SwapButton />
     </header>
     <div class="content-wrapper">
@@ -70,7 +70,7 @@
 
 <script>
 import NavBar from "@/components/NavBar";
-import Logo from "@/components/Logo";
+import RzdLogo from "@/components/RzdLogo";
 import SwapButton from "@/components/SwapButton";
 import { useFoxStore } from "@/stores/foxStore";
 import { useDifficultyStore } from "@/stores/difficultyStore";
@@ -82,7 +82,7 @@ export default {
   components: {
     SwapButton,
     NavBar,
-    Logo
+    RzdLogo
   },
   setup() {
     const foxStore = useFoxStore();

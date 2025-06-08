@@ -78,6 +78,13 @@
         ]"
         @start="startGameFromPopup"
     />
+    <FoxTipPopup
+        :visible="foxTipVisible"
+        :foxImg="require('/public/img/fox_provodnik.png')"
+        :message="currentFoxMessage"
+        :closeAllowed="foxTipCloseAllowed"
+        @close="closeFoxTip"
+    />
   </div>
 </template>
 
@@ -89,11 +96,11 @@ import { useWolfEggsScoreStore } from '@/stores/wolfAndEggsStore.js'
 import { useAchievementsStore } from '@/stores/achievementsStore';
 import GameResultPopup from '@/components/GameResultPopup.vue'
 import GameInstructionPopup from '@/components/GameInstructionPopup.vue'
+import FoxTipPopup from '@/components/FoxTipPopup.vue'
 
 export default {
   name: 'WolfAndEggsGame',
-  components: { GameResultPopup, GameInstructionPopup },
-
+  components: { GameResultPopup, GameInstructionPopup, FoxTipPopup },
   setup() {
     const isGameOver = ref(false);
     const finalScore = ref(0);
@@ -103,6 +110,15 @@ export default {
     scoreStore.score = 0;
     const foxStore   = useFoxStore();
     const achievementsStore = useAchievementsStore();
+    const foxTipVisible = ref(false)
+    const foxTipCloseAllowed = ref(false)
+    const currentFoxMessage = ref('')
+    const foxMessages = [
+      'Проводник знает 300+ правил наизусть — от продажи билетов до тушения пожаров!',
+      'В вагонах \'СВ\' (спальный вагон) постель стелют с морским узлом — чтобы не разъехалась на поворотах!',
+      'Раньше в поездах были угольные печки, а теперь — розетки и Wi-Fi!',
+      'Самый длинный пассажирский маршрут — Москва–Владивосток: 9 288 км и 7 дней пути!'
+    ];
     const router = useRouter();
     let score = 0
     let level = 1
@@ -110,7 +126,6 @@ export default {
     let wolfLevel = 'up'
     let wolfSide = 'right'
     let currPos = 'rc'
-
     let speedUpdatePosition = 100
     let gameProcess = false
     let rollingSpeed
@@ -121,34 +136,27 @@ export default {
     let sunFlag = 0
     let pauseFlag = false
     let game = null
-
     const COIN_RATIO = 0.01;
-
     let gam;
     let CRU
     let CRD
     let CLD
     let CLU
-
     let scoreElement
     let levelElement
     let livesElement
     let pauseElement
     let lock
-
     let crashSound
     let laySound
     let pauseSound
     let lostSound
     let winSound
-
     let wolf
-
     let nestLU
     let nestLD
     let nestRU
     let nestRD
-
     let removeAllEggs
     let clearAllTimeouts
     let anounce
@@ -522,8 +530,26 @@ export default {
       }
     });
 
+    function scheduleFoxTip() {
+      const delay = Math.random() * 20_000 + 10_000
+      setTimeout(() => {
+        currentFoxMessage.value = foxMessages[Math.floor(Math.random() * foxMessages.length)]
+        foxTipVisible.value = true
+        foxTipCloseAllowed.value = false
+        setTimeout(() => { foxTipCloseAllowed.value = true }, 5_000)
+        setTimeout(closeFoxTip, 30_000)
+      }, delay)
+    }
+
+    function closeFoxTip() {
+      foxTipVisible.value = false
+      foxTipCloseAllowed.value = false
+      scheduleFoxTip()
+    }
+
     function startGameFromPopup() {
       showIntro.value = false;
+      scheduleFoxTip()
     }
 
     function exitGame() {
@@ -585,7 +611,12 @@ export default {
       closePopup,
       restartGame,
       showIntro,
-      startGameFromPopup
+      startGameFromPopup,
+      foxTipVisible,
+      foxTipCloseAllowed,
+      foxMessages,
+      closeFoxTip,
+      currentFoxMessage
     }
   }
 }

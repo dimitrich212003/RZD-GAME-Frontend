@@ -1,7 +1,7 @@
 <template>
   <div class="main-menu-container">
     <header class="top-bar">
-      <Logo/>
+      <RzdLogo/>
     </header>
     <div class="games-grid">
       <GameCard
@@ -25,14 +25,14 @@
 <script>
 import GameCard from '../components/GameCard.vue';
 import NavBar from "@/components/NavBar";
-import Logo from "@/components/Logo";
+import RzdLogo from "@/components/RzdLogo";
 
 export default {
   name: 'MainMenu',
   components: {
     NavBar,
     GameCard,
-    Logo
+    RzdLogo
   },
   setup() {
 

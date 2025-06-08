@@ -30,32 +30,38 @@
         ]"
         @start="startGameFromPopup"
     />
+    <FoxTipPopup
+        :visible="foxTipVisible"
+        :foxImg="require('/public/img/fox_machinist.png')"
+        :message="currentFoxMessage"
+        :closeAllowed="foxTipCloseAllowed"
+        @close="closeFoxTip"
+    />
   </div>
 </template>
 
 <script>
-import {ref, onMounted, onUnmounted} from 'vue'
+import {ref, onUnmounted} from 'vue'
 import { usePacmanScoreStore } from '@/stores/pacmanScoreStore'
 import { useFoxStore } from '@/stores/foxStore'
 import { useRouter } from 'vue-router'
 import GameResultPopup from '@/components/GameResultPopup.vue'
 import GameInstructionPopup from '@/components/GameInstructionPopup.vue'
+import FoxTipPopup from '@/components/FoxTipPopup.vue'
 import Boundary from '@/games/pacman/entities/Boundary.js'
 import Player from '@/games/pacman/entities/Player.js'
 import Ghost from '@/games/pacman/entities/Ghost.js'
 import Pellet from '@/games/pacman/entities/Pellet.js'
 import PowerUp from '@/games/pacman/entities/PowerUp.js'
-
 import { circleCollidesWithRectanglePlayer, circleCollidesWithRectangleGhost } from '@/games/pacman/utils/collisions.js'
 import { createImage } from '@/games/pacman/utils/createImage.js'
-
 import { map } from '@/games/pacman/map.js'
 
 const COIN_RATIO = 0.01;
 
 export default {
   name: "PacmanGame",
-  components: { GameResultPopup, GameInstructionPopup },
+  components: { GameResultPopup, GameInstructionPopup, FoxTipPopup },
   setup() {
     const gameCanvas = ref(null)
     const scoreStore = usePacmanScoreStore()
@@ -65,7 +71,15 @@ export default {
     const gameOver = ref(false)
     const finalScore = ref(0)
     const gainedCoins = ref(0)
-
+    const foxTipVisible = ref(false)
+    const foxTipCloseAllowed = ref(false)
+    const currentFoxMessage = ref('')
+    const foxMessages = [
+      'Знаешь ли ты, что самый мощный локомотив в мире — \'Ермак\' — может тянуть состав весом в 10 000 тонн. Это как 100 синих китов!',
+      'Современные поезда \'Сапсан\' разгоняются до 250 км/ч!',
+      'Тормозной путь грузового поезда — до 2 км. Вот почему машинист всегда смотрит далеко вперёд!',
+      'В кабине локомотива есть \'красная кнопка\' — она мгновенно останавливает поезд в экстренной ситуации!'
+    ];
     const SPRITES = {
       player        : createImage('/pacmanSprites/player.png'),
       ghostActive   : createImage('/pacmanSprites/ghost-active.png'),
@@ -102,7 +116,25 @@ export default {
 
     function startGameFromPopup() {
       showIntro.value = false;
+      scheduleFoxTip();
       initGame();
+    }
+
+    function scheduleFoxTip() {
+      const delay = Math.random() * 20_000 + 10_000
+      setTimeout(() => {
+        currentFoxMessage.value = foxMessages[Math.floor(Math.random() * foxMessages.length)]
+        foxTipVisible.value = true
+        foxTipCloseAllowed.value = false
+        setTimeout(() => { foxTipCloseAllowed.value = true }, 5_000)
+        setTimeout(closeFoxTip, 30_000)
+      }, delay)
+    }
+
+    function closeFoxTip() {
+      foxTipVisible.value = false
+      foxTipCloseAllowed.value = false
+      scheduleFoxTip()
     }
 
     function animate() {
@@ -726,7 +758,12 @@ export default {
       closePopup,
       restartGame,
       showIntro,
-      startGameFromPopup
+      startGameFromPopup,
+      foxTipVisible,
+      foxTipCloseAllowed,
+      foxMessages,
+      closeFoxTip,
+      currentFoxMessage
     }
   }
 }

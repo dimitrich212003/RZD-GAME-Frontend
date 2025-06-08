@@ -1,7 +1,7 @@
 <template>
   <div class="select-difficulty-container">
     <header>
-      <Logo/>
+      <RzdLogo/>
     </header>
     <h1 class="select-difficulty-title">Привет! Выбери уровень игры</h1>
     <div class="cards-wrapper">
@@ -27,12 +27,12 @@
 import { useDifficultyStore } from '@/stores/difficultyStore';
 import { useFoxStore } from '@/stores/foxStore';
 import { useRouter } from 'vue-router';
-import Logo from "@/components/Logo";
+import RzdLogo from "@/components/RzdLogo";
 import axios from "axios";
 
 export default {
   name: 'SelectDifficulty',
-  components: {Logo},
+  components: {RzdLogo},
   setup() {
     const difficultyStore = useDifficultyStore();
     const foxStore = useFoxStore();

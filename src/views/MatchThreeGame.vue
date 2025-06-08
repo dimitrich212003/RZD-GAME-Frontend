@@ -24,6 +24,13 @@
         ]"
         @start="startGameFromPopup"
     />
+    <FoxTipPopup
+        :visible="foxTipVisible"
+        :foxImg="require('/public/img/fox_dispatcher.png')"
+        :message="currentFoxMessage"
+        :closeAllowed="foxTipCloseAllowed"
+        @close="closeFoxTip"
+    />
   </div>
 </template>
 
@@ -36,11 +43,12 @@ import { App } from '@/games/match3/system/App.js'
 import { Config } from '@/games/match3/game/Config.js'
 import GameResultPopup from '@/components/GameResultPopup.vue'
 import GameInstructionPopup from '@/components/GameInstructionPopup.vue'
+import FoxTipPopup from '@/components/FoxTipPopup.vue'
 import axios from "axios";
 
 export default {
   name: 'MatchThreeGame',
-  components: { GameResultPopup, GameInstructionPopup },
+  components: { GameResultPopup, GameInstructionPopup, FoxTipPopup },
   setup() {
     const container = ref(null)
     const scoreStore = useMatchThreeScoreStore()
@@ -50,6 +58,15 @@ export default {
     const finalScore = ref(0)
     const gainedCoins = ref(0)
     const showIntro = ref(true);
+    const foxTipVisible = ref(false)
+    const foxTipCloseAllowed = ref(false)
+    const currentFoxMessage = ref('')
+    const foxMessages = [
+      'Одна диспетчерская может управлять движением 200 поездов одновременно!',
+      'Самый загруженный участок РЖД — участок Москва–Санкт-Петербург: до 50 поездов в сутки!',
+      'Зелёный сигнал светофора называют \'попутным\' — он разрешает ехать, но только если диспетчер дал добро!',
+      'Раньше диспетчеры общались свистками, а теперь у них есть цифровые карты всей сети!'
+    ];
 
     onMounted(async () => {
       if (!container.value) return;
@@ -85,8 +102,26 @@ export default {
       }
     })
 
+    function scheduleFoxTip() {
+      const delay = Math.random() * 20_000 + 10_000;
+      setTimeout(() => {
+        currentFoxMessage.value = foxMessages[Math.floor(Math.random() * foxMessages.length)]
+        foxTipVisible.value = true;
+        foxTipCloseAllowed.value = false;
+        setTimeout(() => { foxTipCloseAllowed.value = true }, 5_000)
+        setTimeout(closeFoxTip, 30_000);
+      }, delay)
+    }
+
+    function closeFoxTip() {
+      foxTipVisible.value = false
+      foxTipCloseAllowed.value = false
+      scheduleFoxTip()
+    }
+
     function startGameFromPopup() {
       showIntro.value = false;
+      scheduleFoxTip()
     }
 
     async function exitGame() {
@@ -116,7 +151,12 @@ export default {
       exitGame,
       closePopup,
       startGameFromPopup,
-      showIntro
+      showIntro,
+      foxTipVisible,
+      foxTipCloseAllowed,
+      foxMessages,
+      closeFoxTip,
+      currentFoxMessage
     }
   }
 }

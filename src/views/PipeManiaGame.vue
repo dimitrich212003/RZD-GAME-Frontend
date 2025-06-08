@@ -95,6 +95,13 @@
         ]"
         @start="startGameFromPopup"
     />
+    <FoxTipPopup
+        :visible="foxTipVisible"
+        :foxImg="require('/public/img/fox_puteec.png')"
+        :message="currentFoxMessage"
+        :closeAllowed="foxTipCloseAllowed"
+        @close="closeFoxTip"
+    />
   </div>
 </template>
 <script>
@@ -105,12 +112,13 @@ import { useFoxStore }   from '@/stores/foxStore.js'
 import Game from '@/games/pipemania/game.js'
 import GameResultPopup from '@/components/GameResultPopup.vue'
 import GameInstructionPopup from '@/components/GameInstructionPopup.vue'
+import FoxTipPopup from '@/components/FoxTipPopup.vue'
 
 const COIN_RATIO = 0.01;
 
 export default {
   name: 'PipeManiaGame',
-  components: { GameResultPopup, GameInstructionPopup },
+  components: { GameResultPopup, GameInstructionPopup, FoxTipPopup  },
   setup() {
     const router = useRouter()
     const scoreStore = usePipeManiaScoreStore()
@@ -130,6 +138,15 @@ export default {
     const gainedCoins = ref(0);
     let pipeGame = null
     const showIntro = ref(true);
+    const foxTipVisible = ref(false)
+    const foxTipCloseAllowed = ref(false)
+    const currentFoxMessage = ref('')
+    const foxMessages = [
+      'Знаешь ли ты, что путеец ежедневно проверяет до 3 км пути?',
+      'Все стрелки на станции подписаны — так диспетчеру проще отдавать команды!',
+      'Самая длинная прямая железнодорожная линия в мире — 924 км без поворотов.',
+      'Лопаткой путейцы называют киянку для выправки рельсов — не путай с совком!'
+    ];
 
     onMounted(() => {
       const canvas = boardCanvas.value
@@ -166,8 +183,26 @@ export default {
       })
     })
 
+    function scheduleFoxTip() {
+      const delay = Math.random() * 20_000 + 10_000
+      setTimeout(() => {
+        currentFoxMessage.value = foxMessages[Math.floor(Math.random() * foxMessages.length)]
+        foxTipVisible.value = true
+        foxTipCloseAllowed.value = false
+        setTimeout(() => { foxTipCloseAllowed.value = true }, 5_000)
+        setTimeout(closeFoxTip, 30_000)
+      }, delay)
+    }
+
+    function closeFoxTip() {
+      foxTipVisible.value = false
+      foxTipCloseAllowed.value = false
+      scheduleFoxTip()
+    }
+
     function startGameFromPopup() {
       showIntro.value = false;
+      scheduleFoxTip()
     }
 
     function onStartClick() {
@@ -231,25 +266,21 @@ export default {
     }
 
     return {
-      scoreStore, foxStore,
-
+      scoreStore,
+      foxStore,
       boardCanvas,
       timerBar,
-
       level,
       localScore,
       levelResultMessage,
       nextButtonText,
-
       startDisabled,
       quickFinishDisabled,
       restartDisabled,
       nextDisabled,
-
       gameOver,
       finalScore,
       gainedCoins,
-
       showIntro,
       startGameFromPopup,
       onStartClick,
@@ -258,7 +289,12 @@ export default {
       onNext,
       exitGame,
       closePopup,
-      restartGame
+      restartGame,
+      foxTipVisible,
+      foxTipCloseAllowed,
+      foxMessages,
+      closeFoxTip,
+      currentFoxMessage
     }
   }
 }

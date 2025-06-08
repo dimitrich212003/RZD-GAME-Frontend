@@ -1,7 +1,7 @@
 <template>
   <div class="enter-name-container">
     <header>
-      <Logo/>
+      <RzdLogo/>
     </header>
     <div class="content-wrapper">
       <div class="fox-avatar">
@@ -50,14 +50,14 @@
 import { useFoxStore } from '@/stores/foxStore';
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
-import Logo from "@/components/Logo";
+import RzdLogo from "@/components/RzdLogo";
 import {useDifficultyStore} from "@/stores/difficultyStore";
 import axios from 'axios';
 
 export default {
   name: 'EnterName',
   components: {
-    Logo
+    RzdLogo
   },
   setup() {
     const router = useRouter();

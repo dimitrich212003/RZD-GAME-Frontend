@@ -1,7 +1,7 @@
 <template>
   <div class="achievements-container">
     <header>
-      <Logo />
+      <RzdLogo />
     </header>
     <div>
       <div class="achievements-grid">
@@ -39,7 +39,7 @@
 
 <script>
 import NavBar from "@/components/NavBar";
-import Logo from "@/components/Logo";
+import RzdLogo from "@/components/RzdLogo";
 import { useAchievementsStore } from "@/stores/achievementsStore";
 import {computed, onMounted, ref} from "vue";
 import {useFoxStore} from "@/stores/foxStore";
@@ -48,7 +48,7 @@ export default {
   name: "AchievementsComponent",
   components: {
     NavBar,
-    Logo,
+    RzdLogo,
   },
   setup() {
     const achievementsStore = useAchievementsStore();
